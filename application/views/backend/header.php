@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Pillow | <?php echo $title; ?></title>
+<title>Tweeke | <?php echo $title; ?></title>
     <link href="<?php echo base_url('assets/css/bootstrap.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/css/bootstrap-reset.css'); ?>" rel="stylesheet">
     <!--external css-->
@@ -97,7 +97,7 @@ $(document).ready(function(){
                 <div data-original-title="Toggle Navigation" data-placement="right" class="icon-reorder tooltips"></div>
             </div>
             <!--logo start-->
-            <a href="#" class="logo"> <span>Pillow</span></a>
+            <a href="#" class="logo"> <span>Tweeke</span></a>
             <!--logo end-->
             <div class="top-nav ">
                 <!--search & user info start-->
@@ -216,66 +216,7 @@ $(document).ready(function(){
 		  <?php }
 				?>
 			  </ul>
-			  <!--
-              <ul class="sidebar-menu">
-                  <li class="active">
-                      <a class="" href="<?php echo site_url('site/index'); ?>">
-                          <i class="icon-dashboard"></i>
-                          <span>Dashboard</span>
-                      </a>
-                  </li>
-                
-				  <li >
-                      <a href="<?php echo site_url('site/viewusers'); ?>" class="">
-                          <i class="icon-user"></i>
-                          <span>Users</span>
-                          <span class="arrow"></span>
-                      </a>
-                  </li>
-				  <li >
-                      <a href="<?php echo site_url('site/viewstate'); ?>" class="">
-                          <i class="icon-book"></i>
-                          <span>State</span>
-                          <span class="arrow"></span>
-                      </a>
-                  </li>
-				  <li >
-                      <a href="<?php echo site_url('site/viewcity'); ?>" class="">
-                          <i class="icon-book"></i>
-                          <span>City</span>
-                          <span class="arrow"></span>
-                      </a>
-                  </li>
-				  <li >
-                      <a href="<?php echo site_url('site/viewarea'); ?>" class="">
-                          <i class="icon-road"></i>
-                          <span>Area</span>
-                          <span class="arrow"></span>
-                      </a>
-                  </li>
-				
-				   <li >
-                      <a href="<?php echo site_url('site/viewamenity'); ?>" class="">
-                          <i class="icon-book"></i>
-                          <span>Amenity</span>
-                          <span class="arrow"></span>
-                      </a>
-                  </li>
-				   <li >
-                      <a href="<?php echo site_url('site/viewproperty'); ?>" class="">
-                          <i class="icon-building"></i>
-                          <span>Property</span>
-                          <span class="arrow"></span>
-                      </a>
-                  </li>
-				   <li >
-                      <a href="<?php echo site_url('site/viewbuilder'); ?>" class="">
-                          <i class="icon-building"></i>
-                          <span>Builder</span>
-                          <span class="arrow"></span>
-                      </a>
-                  </li>-->
-              </ul>
+<!--              </ul>-->
               <!-- sidebar menu end-->
           </div>
       </aside>
