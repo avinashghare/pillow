@@ -29,7 +29,7 @@ class HAuth extends CI_Controller {
 
                     $sociallogin=$this->user_model->sociallogin($user_profile,$provider);
 
-                    redirect($this->input->get_post("returnurl"));
+                    //redirect($this->input->get_post("returnurl"));
 
 					// $data['message'] = $sociallogin;
 

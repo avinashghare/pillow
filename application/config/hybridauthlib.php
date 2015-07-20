@@ -69,7 +69,7 @@ $config =
 			"Instagram" => array (
 				"enabled" => true,
 //				"keys"    => array ( "id" => "99ee67e817dd428b9fbfe6eb5eaf3ab8", "secret" => "9775026daadd47a3b1d72b76f966d6f1" )
-				"keys"    => array ( "id" => "15485f40c268468b922f8df1631186f7", "secret" => "7104771a4c6f49de9cd961cc3c84a049" )
+				"keys"    => array ( "id" => "cffd3b87c2364702af68bfb0d577be72", "secret" => "e784b95e80124871be59dfc535306e2d" )
 			),
 		),
 
