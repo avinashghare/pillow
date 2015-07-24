@@ -120,10 +120,16 @@ class HAuth extends CI_Controller {
 			$data["message"]= array("value"=>true);
 		}
 		else {
-			$this->db->query("INSERT INTO `login_log` (`id`, `type`, `value`, `timestamp`) VALUES (NULL, $type, NULL, CURRENT_TIMESTAMP)");
+			$this->db->query("INSERT INTO `login_log` (`id`, `type`, `value`, `timestamp`) VALUES (NULL, '$type', NULL, CURRENT_TIMESTAMP)");
 			$id=$this->db->insert_id();
 			$data["message"]= array("value"=>false,"id"=>$id);
 		}
+		$this->load->view("json",$data);
+	}
+
+	public function checkLogid() {
+		$logid=$this->input->get("logid");
+		$data["message"]=$this->db->query("SELECT * FROM `login_log` WHERE `id`='$logid'")->row();
 		$this->load->view("json",$data);
 	}
 
