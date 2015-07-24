@@ -99,7 +99,7 @@ class HAuth extends CI_Controller {
 	}
 	public function posttweet()
     {
-        
+
         $twitter = $this->hybridauthlib->authenticate("Twitter");
 $message=$this->input->get_post("message");
 				if ($twitter->isUserConnected())
@@ -137,8 +137,9 @@ $message=urlencode($message);
 
 
     }
-    public function postfb()
+    public function getfacebookimages()
     {
+        $limit=50;
         try
         {
         $facebook = $this->hybridauthlib->authenticate("Facebook");
@@ -154,60 +155,26 @@ $message=urlencode($message);
 				{
 
 					$facebookid = $facebook->getUserProfile();
-	        $facebookid = $facebookid->identifier;
+	                $facebookid = $facebookid->identifier;
 
-					if($image=="")
-					{
+                    $images=$facebook->api()->api("v2.4/me/photos/uploaded?fields=images&limit=$limit", "GET", array(
+                            "message" => "$message",
+                            "link"=>"$link"
+                    ));
 
-							$data["message"]=$facebook->api()->api("v2.2/me/feed", "post", array(
-									"message" => "$message",
-									"link"=>"$link"
-							));
-
-							if(isset($data["message"]['id']))
-							{
-	//                echo "hauth".$project;
-									$orderid=$this->user_model->updatepost($data["message"]['id'],$project,$facebookid);
-                                    $hashvalue=base64_encode ($orderid."&powerforone");
-									$redirecturlvalue=$this->input->get_post("returnurl")."/".$hashvalue;
-									redirect($redirecturlvalue);
-	//							$this->load->view("json",$data);
-							}
-							else
-							{
-                                redirect("http://www.powerforone.org/#/campaign/$project");
-	//							$this->load->view("json",$data);
-							}
-					}
-					else
-					{
-							$data["message"]=$facebook->api()->api("v2.2/me/feed", "post", array(
-									"message" => "$message",
-									"picture"=> "$image",
-									"link"=>"$link"
-							));
-
-	//            print_r($data['message']["id"]);
-
-							if(isset($data["message"]["id"]))
-							{
-
-									redirect($this->input->get_post("returnurl"));
-
-							$this->load->view("json",$data);
-							}
-							else
-							{
+                    $images=$images["data"];
+                    for($i=0;$i<sizeof($images);$i++)
+                    {
+                        $images[$i]=$images[$i]["images"][0]["source"];
+                    }
+                    $data["message"]=$images;
+                    $this->load->view("json",$data);
 
 
-									redirect($this->input->get_post("returnurl"));
-									$this->load->view("json",$data);
-							}
-					}
 				}
 				else // Cannot authenticate user
 				{
-                    redirect("http://www.powerforone.org/#/campaign/$project");
+                    redirect("http://www.wohlig.com");
 					show_error('Cannot authenticate user');
 				}
         }
@@ -219,6 +186,11 @@ $message=urlencode($message);
 
 
 
+    }
+
+    public function logout()
+    {
+        $this->hybridauthlib->logoutAllProviders();
     }
 
 }
