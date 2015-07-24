@@ -9,8 +9,9 @@ class HAuth extends CI_Controller {
 
 	public function login($provider)
 	{
+		$logid=$this->input->get("logid");
 		log_message('debug', "controllers.HAuth.login($provider) called");
-
+		$logvalue="";
 		try
 		{
 			log_message('debug', 'controllers.HAuth.login: loading HybridAuthLib');
@@ -28,6 +29,7 @@ class HAuth extends CI_Controller {
 					$user_profile = $service->getUserProfile();
 
                     $sociallogin=$this->user_model->sociallogin($user_profile,$provider);
+										$logvalue="SUCCESS";
 
                     //redirect($this->input->get_post("returnurl"));
 
@@ -38,12 +40,14 @@ class HAuth extends CI_Controller {
 				else // Cannot authenticate user
 				{
 					show_error('Cannot authenticate user');
+					$logvalue="ERROR";
 				}
 			}
 			else // This service is not enabled.
 			{
 				log_message('error', 'controllers.HAuth.login: This provider is not enabled ('.$provider.')');
 				show_404($_SERVER['REQUEST_URI']);
+				$logvalue="ERROR";
 			}
 		}
 		catch(Exception $e)
@@ -70,6 +74,7 @@ class HAuth extends CI_Controller {
 				case 7 : $error = 'User not connected to the provider.';
 				         break;
 			}
+			$logvalue="ERROR";
 
 			if (isset($service))
 			{
@@ -78,6 +83,13 @@ class HAuth extends CI_Controller {
 
 			log_message('error', 'controllers.HAuth.login: '.$error);
 			show_error('Error authenticating user.');
+
+
+
+		}
+		if($logid!="")
+		{
+				$this->db->query("UPDATE `login_log` SET `value` = '$logvalue' WHERE `login_log`.`id` = $logid;");
 		}
 	}
 
@@ -97,11 +109,30 @@ class HAuth extends CI_Controller {
 		require_once APPPATH.'/third_party/hybridauth/index.php';
 
 	}
-	public function posttweet()
+
+	public function checkLogin()
+	{
+		$type=$this->input->get("type");
+		$isConnected=$this->hybridauthlib->isConnectedWith($type);
+		$data["message"]="";
+		if($isConnected)
+		{
+			$data["message"]= array("value"=>true);
+		}
+		else {
+			$this->db->query("INSERT INTO `login_log` (`id`, `type`, `value`, `timestamp`) VALUES (NULL, $type, NULL, CURRENT_TIMESTAMP)");
+			$id=$this->db->insert_id();
+			$data["message"]= array("value"=>false,"id"=>$id);
+		}
+		$this->load->view("json",$data);
+	}
+
+
+		public function posttweet()
     {
 
         $twitter = $this->hybridauthlib->authenticate("Twitter");
-$message=$this->input->get_post("message");
+				$message=$this->input->get_post("message");
 				if ($twitter->isUserConnected())
 				{
 						$message=$this->input->get_post("message");
@@ -109,7 +140,7 @@ $message=$this->input->get_post("message");
 						$project=$this->input->get('project');
 						$twitterid = $twitter->getUserProfile();
 						$twitterid = $twitterid->identifier;
-$message=urlencode($message);
+						$message=urlencode($message);
 
 
 
@@ -137,7 +168,7 @@ $message=urlencode($message);
 
 
     }
-    public function getfacebookimages()
+    public function getFacebookImages()
     {
         $limit=50;
         try
