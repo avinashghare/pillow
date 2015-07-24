@@ -225,6 +225,47 @@ class HAuth extends CI_Controller {
 
     }
 
+
+		public function getInstagramImages()
+    {
+        $limit=50;
+        try
+        {
+        $instagram = $this->hybridauthlib->authenticate("Instagram");
+
+
+				if ($instagram->isUserConnected())
+				{
+
+
+                    $images=$instagram->api()->api("users/self/media/recent/");
+                    $images=$images->data;
+                    for($i=0;$i<sizeof($images);$i++)
+                    {
+                        $images[$i]=$images[$i]->images->standard_resolution->url;
+                    }
+                    $data["message"]=$images;
+                    $this->load->view("json",$data);
+
+
+				}
+				else // Cannot authenticate user
+				{
+                    redirect("http://www.wohlig.com");
+					show_error('Cannot authenticate user');
+				}
+        }
+		catch(Exception $e)
+		{
+            redirect("http://www.powerforone.org/#/campaign/$project");
+        }
+
+
+
+
+    }
+
+
     public function logout()
     {
         $this->hybridauthlib->logoutAllProviders();

@@ -32,7 +32,7 @@ $config =
 			"Google" => array (
 				"enabled" => true,
 				"keys"    => array ( "id" => "40595885202-8j9u26oeo850me2r1dcqn77o5is12vq3.apps.googleusercontent.com", "secret" => "OxXR_vcyKrg-juM71_sQoJiq" )
-				
+
 			),
 
 			"Facebook" => array (
@@ -69,7 +69,7 @@ $config =
 			"Instagram" => array (
 				"enabled" => true,
 //				"keys"    => array ( "id" => "99ee67e817dd428b9fbfe6eb5eaf3ab8", "secret" => "9775026daadd47a3b1d72b76f966d6f1" )
-				"keys"    => array ( "id" => "cffd3b87c2364702af68bfb0d577be72", "secret" => "e784b95e80124871be59dfc535306e2d" )
+				"keys"    => array ( "id" => "cc69745197924c859870ba00556cf94c", "secret" => "8f8d7b464d3d4c27abef747143c4ea64" )
 			),
 		),
 
