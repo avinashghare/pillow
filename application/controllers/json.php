@@ -3,6 +3,12 @@ class Json extends CI_Controller
 {
     //apis by avinash
     
+    public function checkdata()
+    {
+    
+        $data = json_decode(file_get_contents('php://input'), true);
+        print_r($data);
+    }
     public function authenticate()
     {
         $data['message']=$this->user_model->authenticate();
@@ -58,14 +64,20 @@ class Json extends CI_Controller
 
     public function createpillow()
     {
-        $files=$this->input->get_post('files');
-        $userid=$this->db->get_post('userid');
+        
+        $data = json_decode(file_get_contents('php://input'), true);
+        $files=$data['image'];
+        $userid=$data['userid'];
+//        print_r($data);
+//        $files=$this->input->get_post('files');
+//        $userid=$this->db->get_post('userid');
         
         $orderid=$this->order_model->addorderonproceed($userid);
         $orderproductid=$this->order_model->addorderproductonproceed($orderid);
-        foreach($files as $file)
+        foreach($files as $key=>$file)
         {
             $imageurl=$file->img;
+            $order=$key;
             $checkcharacters=substr($imageurl, 0, 5);
             if($checkcharacters=="https")
             {
@@ -76,16 +88,28 @@ class Json extends CI_Controller
                 /* Save file wherever you want */
                 
                 file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
-                $orderproductid=$this->order_model->addorderimageonproceed($orderproductid,$filename);
+                $orderproductid=$this->order_model->addorderimageonproceed($orderproductid,$filename,$order);
 //                echo "<br>".$filename."<br>";
 //                echo base_url() .'uploads/'.$filename;
             }
             else
             {
-                
+                $filename=$file->img;
+                $orderproductid=$this->order_model->addorderimageonproceed($orderproductid,$filename,$order);
             }
         }
+        return 1;
     
+    }
+    
+    
+    function login() 
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $email=$data["email"];
+        $password=$data["password"];
+        $data["message"] = $this->user_model->loginuser($email, $password);
+        $this->load->view("json", $data);
     }
     //cart functions
     
@@ -95,11 +119,11 @@ class Json extends CI_Controller
         $data["message"] = $this->order_model->getusercart($user);
         $this->load->view("json", $data);
     }
-    function addcartsession() {
-        $cart = $this->input->get_post('cart');
-        $data["message"] = $this->order_model->addcartsession($cart);
-        $this->load->view("json", $data);
-    }
+//    function addcartsession() {
+//        $cart = $this->input->get_post('cart');
+//        $data["message"] = $this->order_model->addcartsession($cart);
+//        $this->load->view("json", $data);
+//    }
     function addtocart() {
         $user = $this->input->get_post('user');
         $product = $this->input->get_post('product');
@@ -141,6 +165,162 @@ class Json extends CI_Controller
         $data["message"] = $this->cart->total_items();
         $this->load->view("json", $data);
     }
+    
+    function getorderproductbyuser()
+    {
+        $userid=$this->input->get("userid");
+        $elements=array();
+        
+        $elements[0]=new stdClass();
+        $elements[0]->field="`pillow_orderproduct`.`id`";
+        $elements[0]->sort="1";
+        $elements[0]->header="ID";
+        $elements[0]->alias="id";
+
+        $elements[1]=new stdClass();
+        $elements[1]->field="`pillow_orderproduct`.`order`";
+        $elements[1]->sort="1";
+        $elements[1]->header="Order";
+        $elements[1]->alias="order";
+
+        $elements[2]=new stdClass();
+        $elements[2]->field="`pillow_orderproduct`.`product`";
+        $elements[2]->sort="1";
+        $elements[2]->header="Product";
+        $elements[2]->alias="product";
+
+        $elements[3]=new stdClass();
+        $elements[3]->field="`pillow_orderproduct`.`quantity`";
+        $elements[3]->sort="1";
+        $elements[3]->header="Quantity";
+        $elements[3]->alias="quantity";
+
+        $elements[4]=new stdClass();
+        $elements[4]->field="`pillow_orderproduct`.`price`";
+        $elements[4]->sort="1";
+        $elements[4]->header="Price";
+        $elements[4]->alias="price";
+
+        $elements[5]=new stdClass();
+        $elements[5]->field="`pillow_orderproduct`.`discount`";
+        $elements[5]->sort="1";
+        $elements[5]->header="Discount";
+        $elements[5]->alias="discount";
+
+        $elements[6]=new stdClass();
+        $elements[6]->field="`pillow_orderproduct`.`finalprice`";
+        $elements[6]->sort="1";
+        $elements[6]->header="Final Price";
+        $elements[6]->alias="finalprice";
+
+        $elements[7]=new stdClass();
+        $elements[7]->field="`pillow_orderproduct`.`thumbnail`";
+        $elements[7]->sort="1";
+        $elements[7]->header="Thumbnail";
+        $elements[7]->alias="thumbnail";
+
+        $elements[8]=new stdClass();
+        $elements[8]->field="`pillow_order`.`email`";
+        $elements[8]->sort="1";
+        $elements[8]->header="email";
+        $elements[8]->alias="email";
+
+        $search=$this->input->get_post("search");
+        $pageno=$this->input->get_post("pageno");
+        $orderby=$this->input->get_post("orderby");
+        $orderorder=$this->input->get_post("orderorder");
+        $maxrow=$this->input->get_post("maxrow");
+        if($maxrow=="")
+        {
+            $maxrow="10";
+        }
+        if($orderby=="")
+        {
+            $orderby="id";
+            $orderorder="ASC";
+        }
+        $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_order`.`id`=`pillow_orderproduct`.`order`","WHERE `pillow_order`.`user`='$userid'");
+        $this->load->view("json",$data);
+    }
+    
+    
+    
+    function getallorders()
+    {
+        $elements=array();
+        
+        $elements[0]=new stdClass();
+        $elements[0]->field="`pillow_orderproduct`.`id`";
+        $elements[0]->sort="1";
+        $elements[0]->header="ID";
+        $elements[0]->alias="id";
+
+        $elements[1]=new stdClass();
+        $elements[1]->field="`pillow_orderproduct`.`order`";
+        $elements[1]->sort="1";
+        $elements[1]->header="Order";
+        $elements[1]->alias="order";
+
+        $elements[2]=new stdClass();
+        $elements[2]->field="`pillow_orderproduct`.`product`";
+        $elements[2]->sort="1";
+        $elements[2]->header="Product";
+        $elements[2]->alias="product";
+
+        $elements[3]=new stdClass();
+        $elements[3]->field="`pillow_orderproduct`.`quantity`";
+        $elements[3]->sort="1";
+        $elements[3]->header="Quantity";
+        $elements[3]->alias="quantity";
+
+        $elements[4]=new stdClass();
+        $elements[4]->field="`pillow_orderproduct`.`price`";
+        $elements[4]->sort="1";
+        $elements[4]->header="Price";
+        $elements[4]->alias="price";
+
+        $elements[5]=new stdClass();
+        $elements[5]->field="`pillow_orderproduct`.`discount`";
+        $elements[5]->sort="1";
+        $elements[5]->header="Discount";
+        $elements[5]->alias="discount";
+
+        $elements[6]=new stdClass();
+        $elements[6]->field="`pillow_orderproduct`.`finalprice`";
+        $elements[6]->sort="1";
+        $elements[6]->header="Final Price";
+        $elements[6]->alias="finalprice";
+
+        $elements[7]=new stdClass();
+        $elements[7]->field="`pillow_orderproduct`.`thumbnail`";
+        $elements[7]->sort="1";
+        $elements[7]->header="Thumbnail";
+        $elements[7]->alias="thumbnail";
+
+        $elements[8]=new stdClass();
+        $elements[8]->field="`pillow_order`.`email`";
+        $elements[8]->sort="1";
+        $elements[8]->header="email";
+        $elements[8]->alias="email";
+
+        $search=$this->input->get_post("search");
+        $pageno=$this->input->get_post("pageno");
+        $orderby=$this->input->get_post("orderby");
+        $orderorder=$this->input->get_post("orderorder");
+        $maxrow=$this->input->get_post("maxrow");
+        if($maxrow=="")
+        {
+            $maxrow="10";
+        }
+        if($orderby=="")
+        {
+            $orderby="id";
+            $orderorder="ASC";
+        }
+        $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_order`.`id`=`pillow_orderproduct`.`order`");
+        $this->load->view("json",$data);
+    }
+    
     
     //avinash apis end
     

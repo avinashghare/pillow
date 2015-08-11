@@ -480,7 +480,7 @@ class User_model extends CI_Model
                 'logintype'=>$provider
             );
 
-//            $this->session->set_userdata($newdata);
+            $this->session->set_userdata($newdata);
 
             return $newdata;
 
@@ -533,6 +533,30 @@ class User_model extends CI_Model
 
     }
     
+    function loginuser($email,$password)
+    {
+        $password=md5($password);
+        $query=$this->db->query("SELECT `id` FROM `user` WHERE `email`='$email' AND `password`= '$password'");
+        if($query->num_rows > 0)
+        {
+            $user=$query->row();
+            $user=$user->id;
+
+
+            $newdata = array(
+                'email'     => $email,
+                'logged_in' => 'true',
+                'id'=> $user
+            );
+
+            $this->session->set_userdata($newdata);
+
+            return $newdata;
+        }
+        else
+        return false;
+    }
+
     
     //cart functions
     

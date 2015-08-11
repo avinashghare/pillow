@@ -77,6 +77,12 @@ class order_model extends CI_Model
         $id=$this->db->insert_id();
         return $id;
     }
+    function addorderimageonproceed($orderproductid,$filename,$order)
+    {
+        $query=$this->db->query("INSERT INTO `pillow_orderproductimage`(`id`, `orderproduct`,`image`,`order`) VALUES (NULL,'$orderproductid','$filename','$order')");
+        $id=$this->db->insert_id();
+        return $id;
+    }
     //cart functions
     
     
