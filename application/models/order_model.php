@@ -96,6 +96,28 @@ class order_model extends CI_Model
         $id=$this->db->insert_id();
         return $id;
     }
+    
+    function getorderproductbyid($orderproductid)
+    {
+        $query=$this->db->query("SELECT `pillow_orderproduct`.`id`, `pillow_orderproduct`.`order`, `pillow_orderproduct`.`product`,`pillow_orderproduct`. `quantity`,`pillow_orderproduct`. `price`,`pillow_orderproduct`. `discount`,`pillow_orderproduct`. `finalprice`,`pillow_orderproduct`. `thumbnail`
+FROM `pillow_orderproduct` 
+WHERE `id`='$orderproductid'")->row();
+        $query->images=$this->db->query("SELECT `pillow_orderproductimage`.`id`, `pillow_orderproductimage`.`orderproduct`,`pillow_orderproductimage`. `image`,`pillow_orderproductimage`. `order`,`pillow_orderproductimage`. `left`,`pillow_orderproductimage`. `top`
+FROM `pillow_orderproductimage` 
+        WHERE `pillow_orderproductimage` .`orderproduct`='$orderproductid'")->result();
+        return $query;
+    }
+    
+    function getuserproductcartbyid($userproductcartid)
+    {
+        $query=$this->db->query("SELECT `userproductcart`.`id`,`userproductcart`. `user`,`userproductcart`. `product`,`userproductcart`. `quantity`,`userproductcart`. `price`,`userproductcart`. `discount`,`userproductcart`. `finalprice`,`userproductcart`. `thumbnail`,`user`.`email`
+FROM `userproductcart` LEFT OUTER JOIN `user` ON `user`.`id`=`userproductcart`.`user`
+WHERE `userproductcart`.`id`='$userproductcartid'")->row();
+        $query->images=$this->db->query("SELECT `userproductimagecart`.`id`,`userproductimagecart`. `userproductcart`,`userproductimagecart`. `image`,`userproductimagecart`. `order`,`userproductimagecart`. `left`,`userproductimagecart`. `top`
+FROM `userproductimagecart` 
+        WHERE `userproductimagecart` .`userproductcart`='$userproductcartid'")->result();
+        return $query;
+    }
     //cart functions
     
     

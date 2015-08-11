@@ -88,7 +88,7 @@ class Json extends CI_Controller
             else
             {
                 echo "in normal".$key;
-                $imageurl=$file['img'];
+                $filename=$file['img'];
                 $this->order_model->addorderimageonproceed($orderproductid,$filename,$order);
             }
         }
@@ -112,7 +112,7 @@ class Json extends CI_Controller
             $checkcharacters=substr($imageurl, 0, 5);
             if($checkcharacters=="https")
             {
-                echo "in http".$key;
+//                echo "in http".$key;
                 $date = new DateTime();
                 $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
                 
@@ -121,8 +121,8 @@ class Json extends CI_Controller
             }
             else
             {
-                echo "in normal".$key;
-                $imageurl=$file['img'];
+//                echo "in normal".$key;
+                $filename=$file['img'];
                 $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order);
             }
         }
@@ -345,6 +345,93 @@ class Json extends CI_Controller
             $orderorder="ASC";
         }
         $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_order`.`id`=`pillow_orderproduct`.`order`");
+        $this->load->view("json",$data);
+    }
+    
+    
+    
+    
+    function getallcartbyuser()
+    {
+        $userid=$this->input->get("userid");
+        $elements=array();
+        
+        $elements[0]=new stdClass();
+        $elements[0]->field="`userproductcart`.`id`";
+        $elements[0]->sort="1";
+        $elements[0]->header="ID";
+        $elements[0]->alias="id";
+
+        $elements[1]=new stdClass();
+        $elements[1]->field="`userproductcart`.`user`";
+        $elements[1]->sort="1";
+        $elements[1]->header="User";
+        $elements[1]->alias="user";
+
+        $elements[2]=new stdClass();
+        $elements[2]->field="`userproductcart`.`product`";
+        $elements[2]->sort="1";
+        $elements[2]->header="Product";
+        $elements[2]->alias="product";
+
+        $elements[3]=new stdClass();
+        $elements[3]->field="`userproductcart`.`quantity`";
+        $elements[3]->sort="1";
+        $elements[3]->header="Quantity";
+        $elements[3]->alias="quantity";
+
+        $elements[4]=new stdClass();
+        $elements[4]->field="`userproductcart`.`price`";
+        $elements[4]->sort="1";
+        $elements[4]->header="Price";
+        $elements[4]->alias="price";
+
+        $elements[5]=new stdClass();
+        $elements[5]->field="`userproductcart`.`discount`";
+        $elements[5]->sort="1";
+        $elements[5]->header="Discount";
+        $elements[5]->alias="discount";
+
+        $elements[6]=new stdClass();
+        $elements[6]->field="`userproductcart`.`finalprice`";
+        $elements[6]->sort="1";
+        $elements[6]->header="Final Price";
+        $elements[6]->alias="finalprice";
+
+        $elements[7]=new stdClass();
+        $elements[7]->field="`userproductcart`.`thumbnail`";
+        $elements[7]->sort="1";
+        $elements[7]->header="Thumbnail";
+        $elements[7]->alias="thumbnail";
+
+        $elements[8]=new stdClass();
+        $elements[8]->field="`user`.`email`";
+        $elements[8]->sort="1";
+        $elements[8]->header="email";
+        $elements[8]->alias="email";
+
+        $search=$this->input->get_post("search");
+        $pageno=$this->input->get_post("pageno");
+        $orderby=$this->input->get_post("orderby");
+        $orderorder=$this->input->get_post("orderorder");
+        $maxrow=$this->input->get_post("maxrow");
+        if($maxrow=="")
+        {
+            $maxrow="10";
+        }
+        if($orderby=="")
+        {
+            $orderby="id";
+            $orderorder="ASC";
+        }
+        $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `userproductcart` LEFT OUTER JOIN `user` ON `user`.`id`=`userproductcart`.`user`","WHERE `userproductcart`.`user`='$userid'");
+        $this->load->view("json",$data);
+    }
+    
+    public function getorderproductbyid()
+    {
+        $orderproductid=$this->input->get_post('id');
+        $data['message']=$this->order_model->getuserproductcartbyid($orderproductid);
         $this->load->view("json",$data);
     }
     
