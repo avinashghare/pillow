@@ -68,34 +68,28 @@ class Json extends CI_Controller
         $data = json_decode(file_get_contents('php://input'), true);
         $files=$data['image'];
         $userid=$data['userid'];
-//        print_r($data);
-//        $files=$this->input->get_post('files');
-//        $userid=$this->db->get_post('userid');
         
         $orderid=$this->order_model->addorderonproceed($userid);
         $orderproductid=$this->order_model->addorderproductonproceed($orderid);
         foreach($files as $key=>$file)
         {
-            $imageurl=$file->img;
+            $imageurl=$file['img'];
             $order=$key;
             $checkcharacters=substr($imageurl, 0, 5);
             if($checkcharacters=="https")
             {
-                
+                echo "in http".$key;
                 $date = new DateTime();
                 $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
                 
-                /* Save file wherever you want */
-                
                 file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
-                $orderproductid=$this->order_model->addorderimageonproceed($orderproductid,$filename,$order);
-//                echo "<br>".$filename."<br>";
-//                echo base_url() .'uploads/'.$filename;
+                $this->order_model->addorderimageonproceed($orderproductid,$filename,$order);
             }
             else
             {
-                $filename=$file->img;
-                $orderproductid=$this->order_model->addorderimageonproceed($orderproductid,$filename,$order);
+                echo "in normal".$key;
+                $imageurl=$file['img'];
+                $this->order_model->addorderimageonproceed($orderproductid,$filename,$order);
             }
         }
         return 1;

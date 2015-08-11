@@ -498,7 +498,7 @@ class User_model extends CI_Model
                 'logintype'=>$provider
             );
 
-//            $this->session->set_userdata($newdata);
+            $this->session->set_userdata($newdata);
 
             return $newdata;
         }
