@@ -294,18 +294,32 @@ class User_model extends CI_Model
 
 
     }
+//    function authenticate() {
+//        $is_logged_in = $this->session->userdata( 'logged_in' );
+//        //print_r($is_logged_in);
+//        if ( $is_logged_in !== 'true' || !isset( $is_logged_in ) ) {
+//            return false;
+//        } //$is_logged_in !== 'true' || !isset( $is_logged_in )
+//        else {
+//            $userid = $this->session->userdata( 'id' );
+//         return $userid;
+//        }
+//    }
+    
     function authenticate() {
-        $is_logged_in = $this->session->userdata( 'logged_in' );
-        //print_r($is_logged_in);
-        if ( $is_logged_in !== 'true' || !isset( $is_logged_in ) ) {
+         $is_logged_in = $this->session->userdata( 'logged_in' );
+        //print_r($this->session->userdata( 'logged_in' ));
+//        echo "demo".$is_logged_in."demo";
+        if ($is_logged_in=="" || empty($is_logged_in)) {
             return false;
         } //$is_logged_in !== 'true' || !isset( $is_logged_in )
         else {
-            $userid = $this->session->userdata( 'id' );
-         return $userid;
+		$userid=$this->session->userdata('id');
+		$query=$this->db->query("SELECT * FROM `user` WHERE `id`='$userid'")->row();
+           // $userid = $this->session->userdata( );
+         return $query;
         }
     }
-    
     function frontendauthenticate($email,$password) 
     {
         $query=$this->db->query("SELECT `id`, `name`, `email`, `accesslevel`, `timestamp`, `status`, `image`, `username`, `socialid`, `logintype`, `json` FROM `user` WHERE `email` LIKE '$email' AND `password`='$password' LIMIT 0,1");

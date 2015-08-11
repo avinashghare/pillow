@@ -96,6 +96,39 @@ class Json extends CI_Controller
     
     }
     
+    public function addtocart()
+    {
+    
+        $data = json_decode(file_get_contents('php://input'), true);
+        $files=$data['image'];
+        $userid=$data['userid'];
+        
+//        $orderid=$this->order_model->add($userid);
+        $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid);
+        foreach($files as $key=>$file)
+        {
+            $imageurl=$file['img'];
+            $order=$key;
+            $checkcharacters=substr($imageurl, 0, 5);
+            if($checkcharacters=="https")
+            {
+                echo "in http".$key;
+                $date = new DateTime();
+                $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+                
+                file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
+                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order);
+            }
+            else
+            {
+                echo "in normal".$key;
+                $imageurl=$file['img'];
+                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order);
+            }
+        }
+        return 1;
+    }
+    
     
     function login() 
     {
@@ -118,7 +151,7 @@ class Json extends CI_Controller
 //        $data["message"] = $this->order_model->addcartsession($cart);
 //        $this->load->view("json", $data);
 //    }
-    function addtocart() {
+    function addtocartold() {
         $user = $this->input->get_post('user');
         $product = $this->input->get_post('product');
         $productname = $this->input->get_post('productname');
