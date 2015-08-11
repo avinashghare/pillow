@@ -60,6 +60,43 @@ class order_model extends CI_Model
 			);
 		return $status;
 	}
-	
+    
+    
+	//frontend apis
+    
+    function addorderonproceed($userid)
+    {
+        $query=$this->db->query("INSERT INTO `pillow_order`(`id`, `user`,`orderstatus`) VALUES (NULL,'$userid',1)");
+        $id=$this->db->insert_id();
+        return $id;
+    }
+    
+    function addorderproductonproceed($orderid)
+    {
+        $query=$this->db->query("INSERT INTO `pillow_orderproduct`(`id`, `order`) VALUES (NULL,'$orderid')");
+        $id=$this->db->insert_id();
+        return $id;
+    }
+    //cart functions
+    
+    
+	function getusercart($user)
+	{
+		$query="SELECT `product`.`name`,`product`.`price`, `product`.`wholesaleprice`,`product`.`firstsaleprice`,`usercart`.`user`,`usercart`.`product`,`usercart`.`quantity`,`product`.`id` FROM `product` LEFT JOIN `usercart` ON `product`.`id`=`usercart`.`product` WHERE `usercart`.`user`='$user'";   
+		$query=$this->db->query($query)->result();
+		return $query;
+	}
+    function addtocart($user,$product,$quantity)
+    {
+        $query=$this->db->query("SELECT `user`, `product`, `quantity`, `status`, `timestamp` FROM `usercart` WHERE `user`='$user' AND `product`='$product'");
+        if($query->num_rows > 0)
+        {
+            $query=$this->db->query("UPDATE `usercart` SET `quantity`='$quantity' WHERE '$user'");
+        }
+        else
+        {
+            $query=$this->db->query("INSERT INTO `usercart`(`user`, `product`, `quantity`) VALUES ('$user','$product','$quantity')");
+        }
+    }
 }
 ?>

@@ -1,6 +1,159 @@
 <?php if ( ! defined("BASEPATH")) exit("No direct script access allowed");
 class Json extends CI_Controller 
 {
+    //apis by avinash
+    
+    public function authenticate()
+    {
+        $data['message']=$this->user_model->authenticate();
+		$this->load->view('json',$data);
+    }
+   
+	public function logout( )
+	{
+        $this->session->sess_destroy();
+		if($this->session->userdata('id')=="")
+        {
+            $data['message']=true;
+        }
+        else
+        {
+            $data['message']=false;
+        }
+        $this->load->view('json',$data);
+//		redirect( base_url() . 'index.php/login', 'refresh' );
+	}
+    
+    public function signup()
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $email=$data['email'];
+        $password=$data['password'];
+        $data['message']=$this->user_model->frontendsignup($email, $password);
+        $this->load->view('json',$data);
+    }
+  
+    public function saveimageinuploads()
+    {
+//        $url = 'http://www.gettyimages.in/gi-resources/images/Homepage/Category-Creative/UK/UK_Creative_462809583.jpg';
+        $url = 'https://scontent.cdninstagram.com/hphotos-xaf1/t51.2885-15/s640x640/sh0.08/e35/11351607_1477019669285380_343422983_n.jpg';
+        /* parse file and get hostname*/
+//        $parse = parse_url($url);
+//        print $parse['host'];
+//        echo substr($url, 0, 5);
+        /* Extract the filename */
+//        $timestamp=new DateTime();
+//        $timestamp=$timestamp->format('Y-m-d_H.i.s');
+//        
+//        $filename = substr($url, strrpos($url, '/') + 1);
+//        $filename=$timestamp.$filename;
+        /* Save file wherever you want */
+        $date = new DateTime();
+        $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+//        echo base_url() .'uploads/'.$filename;
+        file_put_contents('uploads/'.$filename, file_get_contents($url));
+        echo "<br>".$filename."<br>";
+        echo base_url() .'uploads/'.$filename;
+    }
+
+    public function createpillow()
+    {
+        $files=$this->input->get_post('files');
+        $userid=$this->db->get_post('userid');
+        
+        $orderid=$this->order_model->addorderonproceed($userid);
+        $orderproductid=$this->order_model->addorderproductonproceed($orderid);
+        foreach($files as $file)
+        {
+            $imageurl=$file->img;
+            $checkcharacters=substr($imageurl, 0, 5);
+            if($checkcharacters=="https")
+            {
+                
+                $date = new DateTime();
+                $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+                
+                /* Save file wherever you want */
+                
+                file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
+                $orderproductid=$this->order_model->addorderimageonproceed($orderproductid,$filename);
+//                echo "<br>".$filename."<br>";
+//                echo base_url() .'uploads/'.$filename;
+            }
+            else
+            {
+                
+            }
+        }
+    
+    }
+    //cart functions
+    
+    
+    function getusercart() {
+        $user = $this->input->get_post('user');
+        $data["message"] = $this->order_model->getusercart($user);
+        $this->load->view("json", $data);
+    }
+    function addcartsession() {
+        $cart = $this->input->get_post('cart');
+        $data["message"] = $this->order_model->addcartsession($cart);
+        $this->load->view("json", $data);
+    }
+    function addtocart() {
+        $user = $this->input->get_post('user');
+        $product = $this->input->get_post('product');
+        $productname = $this->input->get_post('productname');
+        $quantity = $this->input->get_post('quantity');
+        $price = $this->input->get_post('price');
+//        $image = $this->input->get_post('image');
+        $data["message"] = $this->user_model->addtocart($product, $productname, $quantity, $price);
+        //$data["message"]=$this->order_model->addtocart($user,$product,$quantity);
+        $this->load->view("json", $data);
+    }
+    function destroycart() {
+        $data["message"] = $this->user_model->destroycart();
+        $this->load->view("json", $data);
+    }
+    function showcart() {
+        $userid=$this->session->userdata("id");
+        if($userid!="")
+        {
+            $data['message']=$this->user_model->getusercartdetails($userid);
+            $this->load->view("json", $data);
+        }
+        else
+        {
+            $cart = $this->cart->contents();
+            $newcart = array();
+            foreach ($cart as $item) {
+                array_push($newcart, $item);
+            }
+            $data["message"] = $newcart;
+            $this->load->view("json", $data);
+        }
+    }
+    function totalcart() {
+        $data["message"] = $this->cart->total();
+        $this->load->view("json", $data);
+    }
+    function totalitemcart() {
+        $data["message"] = $this->cart->total_items();
+        $this->load->view("json", $data);
+    }
+    
+    //avinash apis end
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     function getallorder()
     {
     $elements=array();

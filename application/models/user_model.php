@@ -503,5 +503,73 @@ class User_model extends CI_Model
             return $newdata;
         }
     }
+    
+    
+    //api functions
+    
+    
+    function frontendsignup($email,$password)
+    {
+         $password=md5($password);
+        $query=$this->db->query("SELECT `id` FROM `user` WHERE `email`='$email'");
+        if($query->num_rows == 0)
+        {
+            $this->db->query("INSERT INTO `user`(`password`, `email`, `accesslevel`) VALUES ('$password','$email',3)");
+            $user=$this->db->insert_id();
+            $newdata = array(
+                'email'     => $email,
+                'password' => $password,
+                'accesslevel' => 3,
+                'logged_in' => true,
+                'id'=> $user
+            );
+            $this->session->set_userdata($newdata);
+            
+           return $newdata;
+        }
+        else
+         return false;
+
+
+    }
+    
+    
+    //cart functions
+    
+    
+    function addtocart($product,$productname,$quantity,$price) {
+        //$data=$this->cart->contents();
+
+        $image=$this->db->query("SELECT `image` FROM `productimage` WHERE `product` = '$product' LIMIT 0,1")->row();
+        $image=$image->image;
+        
+        $data = array(
+               'id'      => $product,
+               'name'      => $productname,
+               'qty'     => $quantity,
+               'price'   => $price,
+               'image'   => $image
+        );
+        //array_push($data,$data2);
+        $userid=$this->session->userdata('id');
+        if($userid=="")
+        {
+
+        }
+        else
+        {
+            $this->db->query("INSERT INTO `usercart`(`user`, `product`, `quantity`, `status`, `timestamp`) VALUES ('$userid','$product','$quantity',1,NULL)");
+        }
+        $this->cart->insert($data);
+    }
+
+    function destroycart() {
+        $this->cart->destroy();
+        $orderid=$this->session->userdata("orderid");
+        $this->db->query("UPDATE `order` SET `orderstatus`='2' WHERE `id`='$orderid'");
+        return 0;
+    }
+
+    
 }
 ?>
