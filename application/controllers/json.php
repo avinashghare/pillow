@@ -102,12 +102,17 @@ class Json extends CI_Controller
         $data = json_decode(file_get_contents('php://input'), true);
         $files=$data['image'];
         $userid=$data['userid'];
+        $productid=$data['productid'];
+        $total=$data['total'];
+        $quantity=$data['quantity'];
         
 //        $orderid=$this->order_model->add($userid);
-        $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid);
+        $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$total,$quantity);
         foreach($files as $key=>$file)
         {
             $imageurl=$file['img'];
+            $left=$file['left'];
+            $top=$file['top'];
             $order=$key;
             $checkcharacters=substr($imageurl, 0, 5);
             if($checkcharacters=="https")
@@ -117,13 +122,13 @@ class Json extends CI_Controller
                 $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
                 
                 file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
-                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order);
+                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
             }
             else
             {
 //                echo "in normal".$key;
                 $filename=$file['img'];
-                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order);
+                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
             }
         }
         return 1;
@@ -431,8 +436,71 @@ class Json extends CI_Controller
     public function getorderproductbyid()
     {
         $orderproductid=$this->input->get_post('id');
-        $data['message']=$this->order_model->getuserproductcartbyid($orderproductid);
+        $data['message']=$this->order_model->getorderproductbyid($orderproductid);
         $this->load->view("json",$data);
+    }
+    
+    public function getuserproductcartbyid()
+    {
+        $userproductcartid=$this->input->get_post('id');
+        $data['message']=$this->order_model->getuserproductcartbyid($userproductcartid);
+        $this->load->view("json",$data);
+    }
+    
+    public function mergeimage()
+    {
+        $src1 = imagecreatefrompng('https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png');
+        $src2 = imagecreatefrompng('http://img15.deviantart.net/e2e6/i/2012/339/8/a/png_material_by_moonglowlilly-d5n4w1c.png');
+
+        //Change the arguments below to suit your needs
+        imagecopymerge($src1, $src2, 50, 50, 50, 50, 200, 200, 100); 
+
+        header('Content-Type: image/png');
+        imagepng($src1);
+
+        imagedestroy($src1);
+        imagedestroy($src2);
+    }
+    
+    //payment gateway
+    
+    function placeorder() {
+        $order = json_decode(file_get_contents('php://input'), true);
+        //print_r($order);
+        $user = $order['user'];
+        $firstname = $order['firstname'];
+        $lastname = $order['lastname'];
+        $email = $order['email'];
+        $phone = $order['phone'];
+        $status = $order['status'];
+//        $company = $order['company'];
+//        $fax = $order['fax'];
+        $billingaddress = $order['billingaddress'];
+        $billingcity = $order['billingcity'];
+        $billingstate = $order['billingstate'];
+        $billingcountry = $order['billingcountry'];
+        $shippingaddress = $order['shippingaddress'];
+        $shippingcity = $order['shippingcity'];
+        $shippingcountry = $order['shippingcountry'];
+        $shippingstate = $order['shippingstate'];
+        $shippingpincode = $order['shippingpincode'];
+        $billingpincode = $order['billingpincode'];
+        $shippingmethod = $order['shippingmethod'];
+//        $carts = $order['cart'];
+        $finalamount = $order['finalamount'];
+        $shippingname = $order['shippingname'];
+        $shippingtel = $order['shippingtel'];
+//        $customernote = $order['customernote'];
+        $data["message"] = $this->order_model->placeorder($user, $firstname, $lastname, $email, $billingaddress, $billingcity, $billingstate, $billingcountry, $shippingaddress, $shippingcity, $shippingcountry, $shippingstate, $shippingpincode, $billingpincode, $phone, $status,  $finalamount, $shippingmethod, $shippingname, $shippingtel);
+//        $data["message"] = $this->order_model->placeorder($user, $firstname, $lastname, $email, $billingaddress, $billingcity, $billingstate, $billingcountry, $shippingaddress, $shippingcity, $shippingcountry, $shippingstate, $shippingpincode, $billingpincode, $phone, $status, $company, $fax, $carts, $finalamount, $shippingmethod, $shippingname, $shippingtel, $customernote);
+        $this->load->view("json", $data);
+    }
+    
+    
+    function updateorderstatusafterpayment() {
+        $orderid = $_POST["orderid"];
+        $returnvalue = $this->order_model->updateorderstatusafterpayment($orderid);
+        return $returnvalue;
     }
     
     

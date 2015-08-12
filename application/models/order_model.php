@@ -78,9 +78,9 @@ class order_model extends CI_Model
         return $id;
     }
     
-    function addorderproductcartonaddtocart($userid)
+    function addorderproductcartonaddtocart($userid,$productid,$total,$quantity)
     {
-        $query=$this->db->query("INSERT INTO `userproductcart`(`id`, `user`) VALUES (NULL,'$userid')");
+        $query=$this->db->query("INSERT INTO `userproductcart`(`id`, `user`,`product`,`quantity`,`finalprice`) VALUES (NULL,'$userid','$productid','$quantity','$total')");
         $id=$this->db->insert_id();
         return $id;
     }
@@ -90,9 +90,9 @@ class order_model extends CI_Model
         $id=$this->db->insert_id();
         return $id;
     }
-    function adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order)
+    function adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top)
     {
-        $query=$this->db->query("INSERT INTO `userproductimagecart`(`id`, `userproductcart`,`image`,`order`) VALUES (NULL,'$orderproductcartid','$filename','$order')");
+        $query=$this->db->query("INSERT INTO `userproductimagecart`(`id`, `userproductcart`,`image`,`order`,`left`,`top`) VALUES (NULL,'$orderproductcartid','$filename','$order','$left','$top')");
         $id=$this->db->insert_id();
         return $id;
     }
@@ -139,5 +139,76 @@ FROM `userproductimagecart`
             $query=$this->db->query("INSERT INTO `usercart`(`user`, `product`, `quantity`) VALUES ('$user','$product','$quantity')");
         }
     }
+    
+//    function placeorder($user,$firstname,$lastname,$email,$billingaddress,$billingcity,$billingstate,$billingcountry,$shippingaddress,$shippingcity,$shippingcountry,$shippingstate,$shippingpincode,$billingpincode,$phone,$status,$company,$fax,$carts,$finalamount,$shippingmethod,$shippingname,$shippingtel,$customernote)
+    
+    function placeorder($user, $firstname, $lastname, $email, $billingaddress, $billingcity, $billingstate, $billingcountry, $shippingaddress, $shippingcity, $shippingcountry, $shippingstate, $shippingpincode, $billingpincode, $phone, $status,  $finalamount, $shippingmethod, $shippingname, $shippingtel)
+	{
+        
+        $mysession=$this->session->all_userdata();
+        
+        $query=$this->db->query("INSERT INTO `pillow_order`(`user`, `firstname`, `lastname`, `email`, `billingaddress`, `billingcity`, `billingstate`, `billingcountry`, `shippingaddress`, `shippingcity`, `shippingcountry`, `shippingstate`, `shippingpincode`, `finalamount`, `billingpincode`,`shippingmethod`,`orderstatus`,`shippingname`,`shippingtel`,`billingcontact`) VALUES ('$user','$firstname','$lastname','$email','$billingaddress','$billingcity','$billingstate','$billingcountry','$shippingaddress','$shippingcity','$shippingcountry','$shippingstate','$shippingpincode','$finalamount','$billingpincode','$shippingmethod','1','$shippingname','$shippingtel','$phone')");
+        
+//        $billingaddressforuser=$billingaddress;
+//        $shippingaddressforuser=$shippingaddress;
+        
+        $order=$this->db->insert_id();
+        $mysession["orderid"]=$order;
+        $this->session->set_userdata($mysession);
+        print_r($this->session->all_userdata());
+        
+        $userproductcartdetails=$this->db->query("SELECT `userproductcart`.`id`,`userproductcart`. `user`,`userproductcart`. `product`,`userproductcart`. `quantity`,`userproductcart`. `price`,`userproductcart`. `discount`,`userproductcart`. `finalprice`,`userproductcart`. `thumbnail`,`user`.`email`
+FROM `userproductcart` LEFT OUTER JOIN `user` ON `user`.`id`=`userproductcart`.`user`
+WHERE `userproductcart`.`user`='$user'")->result();
+        
+        foreach($userproductcartdetails as $key=>$value)
+        {
+            $userproductcartid=$value->id;
+            $orderid=$value->order;
+            $userid=$value->user;
+            $productid=$value->product;
+            $quantity=$value->quantity;
+            $price=$value->price;
+            $discount=$value->discount;
+            $finalprice=$value->finalprice;
+            $thumbnail=$value->thumbnail;
+            
+            $insertqueryforuserproductcart=$this->db->query("INSERT INTO `pillow_orderproduct`(`order`, `product`, `quantity`, `price`, `discount`, `finalprice`, `thumbnail`) VALUES ('$order','$productid','$quantity','$price','$discount','$finalprice','$thumbnail')");
+            $orderproductid=$this->db->insert_id();
+            $userproductcartid=$value->id;
+            $userproductimagecartdetails=$this->db->query("SELECT `userproductimagecart`.`id`,`userproductimagecart`. `userproductcart`,`userproductimagecart`. `image`,`userproductimagecart`. `order`,`userproductimagecart`. `left`,`userproductimagecart`. `top`
+FROM `userproductimagecart` 
+        WHERE `userproductimagecart` .`userproductcart`='$userproductcartid'")->result();
+            
+            foreach($userproductimagecartdetails as $key2=>$value2)
+            {
+                $image=$value2->image;
+                $order=$value2->order;
+                $left=$value2->left;
+                $top=$value2->top;
+                $queryinsertorderproductimage=$this->db->query("INSERT INTO `pillow_orderproductimage`(`orderproduct`, `image`, `order`, `left`, `top`) VALUES ('$orderproductid','$image','$order','$left','$top')");
+            }
+        }
+        
+//        foreach($carts as $cart)
+//        {
+//            $querycart=$this->db->query("INSERT INTO `orderitems`(`order`, `product`, `quantity`, `price`, `finalprice`) VALUES ('$order','".$cart['id']."','".$cart['qty']."','".$cart['price']."','".$cart['subtotal']."')");
+//            $quantity=intval($cart['qty']);
+//            $productid=$cart['id'];
+//            $this->db->query("UPDATE `product` SET `product`.`quantity`=`product`.`quantity`-$quantity WHERE `product`.`id`='$productid'");
+//            
+//            
+//        }
+        
+        
+		return $order;
+	}
+	
+    function updateorderstatusafterpayment($orderid)
+    {
+        $query=$this->db->query("UPDATE `pillow_order` SET `orderstatus`=2 WHERE `id`=$orderid");
+        return $query;
+    }
+    
 }
 ?>
