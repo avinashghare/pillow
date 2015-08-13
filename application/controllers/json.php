@@ -39,6 +39,13 @@ class Json extends CI_Controller
         $this->load->view('json',$data);
     }
   
+    public function getallproducts()
+    {
+        $data['message']=$this->product_model->getallproducts();
+        $this->load->view('json',$data);
+    }
+    
+    
     public function saveimageinuploads()
     {
 //        $url = 'http://www.gettyimages.in/gi-resources/images/Homepage/Category-Creative/UK/UK_Creative_462809583.jpg';
@@ -108,6 +115,48 @@ class Json extends CI_Controller
         
 //        $orderid=$this->order_model->add($userid);
         $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$total,$quantity);
+        foreach($files as $key=>$file)
+        {
+            $imageurl=$file['img'];
+            $left=$file['left'];
+            $top=$file['top'];
+            $order=$key;
+            $checkcharacters=substr($imageurl, 0, 5);
+            if($checkcharacters=="https")
+            {
+//                echo "in http".$key;
+                $date = new DateTime();
+                $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+                
+                file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
+                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+            }
+            else
+            {
+//                echo "in normal".$key;
+                $filename=$file['img'];
+                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+            }
+        }
+        return 1;
+    }
+    
+    
+    
+    public function editcart()
+    {
+    
+        $data = json_decode(file_get_contents('php://input'), true);
+        $files=$data['image'];
+        $userid=$data['userid'];
+        $productid=$data['productid'];
+        $total=$data['total'];
+        $quantity=$data['quantity'];
+        $userproductcartid=$data['userproductcartid'];
+        
+//        $orderid=$this->order_model->add($userid);
+        $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$total,$quantity,$userproductcartid);
+        $deleteuserproductimagecart=$this->order_model->deleteuserproductimagecart($userproductcartid);
         foreach($files as $key=>$file)
         {
             $imageurl=$file['img'];

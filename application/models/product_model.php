@@ -67,5 +67,10 @@ class product_model extends CI_Model
 		return $return;
 	}
     
+    public function getallproducts()
+    {
+        $query=$this->db->query("SELECT * FROM `pillow_product`")->result();
+        return $query;
+    }
 }
 ?>
