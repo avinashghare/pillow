@@ -697,6 +697,12 @@ class Json extends CI_Controller
 //        return 1;
     }
     
+    public function getcountofcartbyuser()
+    {
+        $userid=$this->input->get_post('userid');
+        $data['message']=$this->order_model->getcountofcartbyuser($userid);
+        $this->load->view("json",$data);
+    }
     
     
 } ?>

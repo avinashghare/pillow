@@ -230,5 +230,11 @@ FROM `userproductimagecart`
         return $query;
     }
     
+    function getcountofcartbyuser($userid)
+    {
+        $query=$this->db->query("SELECT COUNT(`id`) AS `count1` FROM `userproductcart` WHERE `user`='$userid'")->row();
+        $count=$query->count1;
+        return intval($count);
+    }
 }
 ?>
