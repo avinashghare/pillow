@@ -236,5 +236,11 @@ FROM `userproductimagecart`
         $count=$query->count1;
         return intval($count);
     }
+    function deletecartbyid($userproductcartid)
+    {
+        $query=$this->db->query("DELETE FROM `userproductcart` WHERE `id`='$userproductcartid'");
+        $querydeleteimages=$this->db->query("DELETE FROM `userproductimagecart` WHERE `userproductcart`='$userproductcartid'");
+        return $query;
+    }
 }
 ?>

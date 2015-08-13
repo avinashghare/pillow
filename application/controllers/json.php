@@ -704,5 +704,12 @@ class Json extends CI_Controller
         $this->load->view("json",$data);
     }
     
+    public function deletecartbyid()
+    {
+        $userproductcartid=$this->input->get_post('id');
+        $data['message']=$this->order_model->deletecartbyid($userproductcartid);
+        $this->load->view("json",$data);
+    }
+    
     
 } ?>
