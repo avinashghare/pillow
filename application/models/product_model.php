@@ -78,7 +78,7 @@ class product_model extends CI_Model
         return $query;
     }
     
-    public function viewmergeimage() {
+    public function viewmergeimage($gotimages) {
         
         $jagzimagesize=240;
         
@@ -86,10 +86,10 @@ class product_model extends CI_Model
         
         $multiplefactor=1200/240;
         
-        $gotimages=array();
-        array_push($gotimages,"1.jpg");
-        array_push($gotimages,"2.jpg");
-        array_push($gotimages,"3.jpg");
+//        $gotimages=array();
+//        array_push($gotimages,"1.jpg");
+//        array_push($gotimages,"2.jpg");
+//        array_push($gotimages,"3.jpg");
 //        array_push($gotimages,"1.jpg");
         
 //        return $gotimages;

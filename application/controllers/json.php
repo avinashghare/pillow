@@ -643,4 +643,60 @@ class Json extends CI_Controller
         $this->load->view('json',$data);
     }
     
+    
+    public function addtocartthumb()
+    {
+        $gotimages=array();
+        $data = json_decode(file_get_contents('php://input'), true);
+        if(!empty($data))
+        {
+            $files=$data['image'];
+            $userid=$data['userid'];
+            $productid=$data['productid'];
+            $price=$data['price'];
+            $quantity=$data['quantity'];
+
+    //        $orderid=$this->order_model->add($userid);
+            $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$price,$quantity);
+            foreach($files as $key=>$file)
+            {
+                $imageurl=$file['img'];
+                $left=$file['left'];
+                $top=$file['top'];
+                $order=$key;
+                $checkcharacters=substr($imageurl, 0, 5);
+                if($checkcharacters=="https")
+                {
+    //                echo "in http".$key;
+                    $date = new DateTime();
+                    $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+                    
+                    file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
+                    array_push($gotimages,$filename);
+                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+                }
+                else
+                {
+    //                echo "in normal".$key;
+                    $filename=$file['img'];
+                    array_push($gotimages,$filename);
+                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+                }
+            }
+            $returnfromthumb=$this->product_model->viewmergeimage($gotimages);
+            $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+            file_put_contents('uploads/'.$thmbnail, file_get_contents($returnfromthumb));
+            $addthumbnailtotable=$this->order_model->addthumbnailtouserproductcart($thmbnail,$orderproductcartid);
+            $data['message']=true;
+        }
+        else
+        {
+            $data['message']=false;
+        }
+        $this->load->view('json',$data);
+//        return 1;
+    }
+    
+    
+    
 } ?>
