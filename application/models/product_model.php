@@ -99,7 +99,7 @@ class product_model extends CI_Model
         for($i=0;$i<count($gotimages);$i++)
         {
             $obj=array();
-            $obj["image"]=imagecreatefromjpeg(base_url('img/'.$gotimages[$i]));
+            $obj["image"]=imagecreatefromjpeg(base_url('uploads/'.$gotimages[$i]));
             $obj["width"]=imagesx($obj["image"]);
             $obj["height"]=imagesy($obj["image"]);
             $obj["top"]=0;
@@ -490,8 +490,12 @@ class product_model extends CI_Model
             
             imagecopymerge($mainimage, $thumb, $image["xaxis"], $image["yaxis"], $image["newleft"], $image["newtop"], $image["boxwidth"], $image["boxheight"], 100); 
         }
+        $date = new DateTime();
+        $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
         
-        return imagejpeg($mainimage, NULL, 85);
+        $thumbnail_image_path=base_url('uploads/'.$thmbnail);
+        imagejpeg($mainimage, $thumbnail_image_path, 85);
+        return $thumbnail_image_path;
     }
     
     

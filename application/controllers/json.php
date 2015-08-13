@@ -669,7 +669,7 @@ class Json extends CI_Controller
                 {
     //                echo "in http".$key;
                     $date = new DateTime();
-                    $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+                    $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
                     
                     file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
                     array_push($gotimages,$filename);
@@ -683,9 +683,11 @@ class Json extends CI_Controller
                     $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
             }
+            print_r($gotimages);
             $returnfromthumb=$this->product_model->viewmergeimage($gotimages);
-            $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
-            file_put_contents('uploads/'.$thmbnail, file_get_contents($returnfromthumb));
+            $thmbnail=$returnfromthumb;
+//            $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
+//            file_put_contents('uploads/'.$thmbnail, file_get_contents($returnfromthumb));
             $addthumbnailtotable=$this->order_model->addthumbnailtouserproductcart($thmbnail,$orderproductcartid);
             $data['message']=true;
         }
