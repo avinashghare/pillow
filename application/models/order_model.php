@@ -152,7 +152,7 @@ FROM `userproductimagecart`
     
     function deleteuserproductimagecart($userproductcartid)
     {
-        $deletequery=$this->db->query("DELETE FROM `userproductimagecart` WHERE `userproduct`='$userproductcartid'");
+        $deletequery=$this->db->query("DELETE FROM `userproductimagecart` WHERE `userproductcart`='$userproductcartid'");
         if($deletequery)
             return 1;
         else

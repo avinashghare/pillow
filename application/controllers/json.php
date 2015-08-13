@@ -182,13 +182,13 @@ class Json extends CI_Controller
                     $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
 
                     file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
-                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+                    $this->order_model->adduserproductimagecartonaddtocart($userproductcartid,$filename,$order,$left,$top);
                 }
                 else
                 {
     //                echo "in normal".$key;
                     $filename=$file['img'];
-                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+                    $this->order_model->adduserproductimagecartonaddtocart($userproductcartid,$filename,$order,$left,$top);
                 }
             }
             $data['message']=true;
