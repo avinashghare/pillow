@@ -191,11 +191,11 @@ class Json extends CI_Controller
                     $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
             }
-            $data['message']=1;
+            $data['message']=true;
         }
         else
         {
-            $data['message']=0;
+            $data['message']=false;
         }
         $this->load->view('json',$data);
 //        return 1;
@@ -508,7 +508,7 @@ class Json extends CI_Controller
             $orderby="id";
             $orderorder="ASC";
         }
-        $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `userproductcart` LEFT OUTER JOIN `user` ON `user`.`id`=`userproductcart`.`user`","WHERE `userproductcart`.`user`='$userid'");
+        $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `userproductcart` LEFT OUTER JOIN `user` ON `user`.`id`=`userproductcart`.`user` LEFT OUTER JOIN `pillow_product` ON `pillow_product`.`id`=`userproductcart`.`product`","WHERE `userproductcart`.`user`='$userid'");
         $this->load->view("json",$data);
     }
     

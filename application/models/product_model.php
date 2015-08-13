@@ -72,6 +72,11 @@ class product_model extends CI_Model
         $query=$this->db->query("SELECT * FROM `pillow_product`")->result();
         return $query;
     }
+    public function getproductbyid($id)
+    {
+        $query=$this->db->query("SELECT * FROM `pillow_product` WHERE `id`='$id'")->row();
+        return $query;
+    }
     
     public function viewmergeimage() {
         
