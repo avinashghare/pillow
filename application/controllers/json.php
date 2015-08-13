@@ -112,11 +112,62 @@ class Json extends CI_Controller
             $files=$data['image'];
             $userid=$data['userid'];
             $productid=$data['productid'];
-            $total=$data['total'];
+            $price=$data['price'];
             $quantity=$data['quantity'];
 
     //        $orderid=$this->order_model->add($userid);
-            $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$total,$quantity);
+            $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$price,$quantity);
+            foreach($files as $key=>$file)
+            {
+                $imageurl=$file['img'];
+                $left=$file['left'];
+                $top=$file['top'];
+                $order=$key;
+                $checkcharacters=substr($imageurl, 0, 5);
+                if($checkcharacters=="https")
+                {
+    //                echo "in http".$key;
+                    $date = new DateTime();
+                    $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+
+                    file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
+                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+                }
+                else
+                {
+    //                echo "in normal".$key;
+                    $filename=$file['img'];
+                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+                }
+            }
+            $data['message']=true;
+        }
+        else
+        {
+            $data['message']=false;
+        }
+        $this->load->view('json',$data);
+//        return 1;
+    }
+    
+    
+    
+    public function editcart()
+    {
+    
+        $data = json_decode(file_get_contents('php://input'), true);
+        if(!empty($data))
+        {
+            $files=$data['image'];
+            $userid=$data['userid'];
+            $productid=$data['productid'];
+            $price=$data['price'];
+            $quantity=$data['quantity'];
+            $userproductcartid=$data['userproductcartid'];
+
+    //        $orderid=$this->order_model->add($userid);
+            $orderproductcartid=$this->order_model->addorderproductcartonaddtocartonedit($userid,$productid,$price,$quantity,$userproductcartid);
+            $deleteuserproductimagecart=$this->order_model->deleteuserproductimagecart($userproductcartid);
             foreach($files as $key=>$file)
             {
                 $imageurl=$file['img'];
@@ -148,48 +199,6 @@ class Json extends CI_Controller
         }
         $this->load->view('json',$data);
 //        return 1;
-    }
-    
-    
-    
-    public function editcart()
-    {
-    
-        $data = json_decode(file_get_contents('php://input'), true);
-        $files=$data['image'];
-        $userid=$data['userid'];
-        $productid=$data['productid'];
-        $total=$data['total'];
-        $quantity=$data['quantity'];
-        $userproductcartid=$data['userproductcartid'];
-        
-//        $orderid=$this->order_model->add($userid);
-        $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$total,$quantity,$userproductcartid);
-        $deleteuserproductimagecart=$this->order_model->deleteuserproductimagecart($userproductcartid);
-        foreach($files as $key=>$file)
-        {
-            $imageurl=$file['img'];
-            $left=$file['left'];
-            $top=$file['top'];
-            $order=$key;
-            $checkcharacters=substr($imageurl, 0, 5);
-            if($checkcharacters=="https")
-            {
-//                echo "in http".$key;
-                $date = new DateTime();
-                $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
-                
-                file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
-                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
-            }
-            else
-            {
-//                echo "in normal".$key;
-                $filename=$file['img'];
-                $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
-            }
-        }
-        return 1;
     }
     
     
@@ -473,6 +482,18 @@ class Json extends CI_Controller
         $elements[8]->header="email";
         $elements[8]->alias="email";
 
+        $elements[9]=new stdClass();
+        $elements[9]->field="`pillow_product`.`xsize`";
+        $elements[9]->sort="1";
+        $elements[9]->header="xsize";
+        $elements[9]->alias="xsize";
+
+        $elements[10]=new stdClass();
+        $elements[10]->field="`pillow_product`.`ysize`";
+        $elements[10]->sort="1";
+        $elements[10]->header="ysize";
+        $elements[10]->alias="ysize";
+
         $search=$this->input->get_post("search");
         $pageno=$this->input->get_post("pageno");
         $orderby=$this->input->get_post("orderby");
@@ -615,5 +636,11 @@ class Json extends CI_Controller
         echo $this->product_model->viewmergeimage();
     }
 
+    public function getproductbyid()
+    {
+        $id=$this->input->get_post('id');
+        $data['message']=$this->product_model->getproductbyid($id);
+        $this->load->view('json',$data);
+    }
     
 } ?>

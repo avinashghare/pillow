@@ -78,12 +78,20 @@ class order_model extends CI_Model
         return $id;
     }
     
-    function addorderproductcartonaddtocart($userid,$productid,$total,$quantity)
+    function addorderproductcartonaddtocart($userid,$productid,$price,$quantity)
     {
-        $query=$this->db->query("INSERT INTO `userproductcart`(`id`, `user`,`product`,`quantity`,`finalprice`) VALUES (NULL,'$userid','$productid','$quantity','$total')");
+        $total=floatval($price)*intval($quantity);
+        $query=$this->db->query("INSERT INTO `userproductcart`(`id`, `user`,`product`,`quantity`,`finalprice`,`price`) VALUES (NULL,'$userid','$productid','$quantity','$total','$price')");
         $id=$this->db->insert_id();
         return $id;
     }
+//    function addorderproductcartonaddtocartonedit($userid,$productid,$price,$quantity,$userproductcartid)
+//    {
+//        $total=floatval($price)*intval($quantity);
+//        $query=$this->db->query("INSERT INTO `userproductcart`(`id`, `user`,`product`,`quantity`,`finalprice`,`price`) VALUES (NULL,'$userid','$productid','$quantity','$total','$price')");
+//        $id=$this->db->insert_id();
+//        return $id;
+//    }
     function addorderimageonproceed($orderproductid,$filename,$order)
     {
         $query=$this->db->query("INSERT INTO `pillow_orderproductimage`(`id`, `orderproduct`,`image`,`order`) VALUES (NULL,'$orderproductid','$filename','$order')");
