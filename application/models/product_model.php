@@ -489,7 +489,10 @@ class product_model extends CI_Model
 //            return imagejpeg($mainimage, NULL, 100);
             
         }
-        return imagejpeg($mainimage, NULL, 100);
+        $date = new DateTime();
+        $thumbnail = "combined-image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+        imagejpeg($mainimage, './uploads/'.$thumbnail, 100);
+        return $thumbnail;
     }
     
     

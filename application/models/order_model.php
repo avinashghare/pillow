@@ -245,7 +245,7 @@ FROM `userproductimagecart`
     
     function addthumbnailtouserproductcart($thmbnail,$userproductcartid)
     {
-        $queryupdate=$this->db->query("UPDATE `userproductcart` SET `thumbnail`='$thmbnail' WHERE `id`='$userproductcart'");
+        $queryupdate=$this->db->query("UPDATE `userproductcart` SET `thumbnail`='$thmbnail' WHERE `id`='$userproductcartid'");
         return $queryupdate;
     }
 }

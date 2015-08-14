@@ -761,12 +761,9 @@ class Json extends CI_Controller
 //            echo $this->product_model->viewmergeimage($gotimages);
             $returnfromthumb=$this->product_model->viewmergeimage($gotimages);
            
-            
+            $this->order_model->addthumbnailtouserproductcart($returnfromthumb,$orderproductcartid);
            
-            $date = new DateTime();
-            $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
-            file_put_contents('uploads/'.$thmbnail, file_get_contents($returnfromthumb));
-            $addthumbnailtotable=$this->order_model->addthumbnailtouserproductcart($thmbnail,$orderproductcartid);
+           
             $data['message']=true;
         }
         else
