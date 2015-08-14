@@ -84,7 +84,7 @@ class product_model extends CI_Model
         
         $mainimage = imagecreatetruecolor(1200, 1200);
         
-        $multiplefactor=1200/240;
+        $multiplefactor=1200/$jagzimagesize;
         
 //        $gotimages=array();
 //        array_push($gotimages,"1.jpg");
@@ -99,18 +99,18 @@ class product_model extends CI_Model
         for($i=0;$i<count($gotimages);$i++)
         {
             $obj=array();
-            $obj["image"]=imagecreatefromjpeg(base_url('uploads/'.$gotimages[$i]));
+            $obj["image"]=imagecreatefromjpeg(base_url('uploads/'.$gotimages[$i]->image));
             $obj["width"]=imagesx($obj["image"]);
             $obj["height"]=imagesy($obj["image"]);
-            $obj["top"]=0;
-            $obj["left"]=0;
+            $obj["top"]=$gotimages[$i]->top;
+            $obj["left"]=$gotimages[$i]->left;
             $obj["newtop"]=$obj["top"]*$multiplefactor;
             $obj["newleft"]=$obj["left"]*$multiplefactor;
             array_push($images,$obj);
         }
         
         
-        
+//        return $images;
         
         {
         //for box 1
@@ -455,7 +455,7 @@ class product_model extends CI_Model
         $imagescount=count($images);
         
         
-//        return $boxes[1][0]["width"];
+        
         
         for($i=0;$i<$imagescount;$i++)
         {
@@ -464,7 +464,6 @@ class product_model extends CI_Model
             $image["boxheight"]=$boxes[$imagescount-1][$i]["heigth"];
             $image["xaxis"]=$boxes[$imagescount-1][$i]["xaxis"];
             $image["yaxis"]=$boxes[$imagescount-1][$i]["yaxis"];
-            
             $image["ratio"]=$image["width"]/$image["height"];
             $image["ratiobox"]=$image["boxwidth"]/$image["boxheight"];
             
@@ -484,18 +483,15 @@ class product_model extends CI_Model
             
             $image["thumbwidth"]=imagesx($thumb);
             $image["thumbheight"]=imagesy($thumb);
-            
-            
+//            return imagejpeg($thumb, NULL, 100);
+//                 return $image;
             
             
             imagecopymerge($mainimage, $thumb, $image["xaxis"], $image["yaxis"], $image["newleft"], $image["newtop"], $image["boxwidth"], $image["boxheight"], 100); 
+            return imagejpeg($mainimage, NULL, 100);
+            
         }
-        $date = new DateTime();
-        $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
-        
-        $thumbnail_image_path=base_url('uploads/'.$thmbnail);
-        imagejpeg($mainimage, $thumbnail_image_path, 85);
-        return $thumbnail_image_path;
+//        return imagejpeg($mainimage, NULL, 100);
     }
     
     

@@ -633,7 +633,66 @@ class Json extends CI_Controller
 //        print_r($this->product_model->viewmergeimage());
 //        
         header("Content-Type: image/jpeg");
-        echo $this->product_model->viewmergeimage();
+        echo $this->menu_model->viewmergeimage();
+    }
+
+    public function viewmergeimage2() {
+        
+//        print_r($this->product_model->viewmergeimage());
+//        
+        
+        $gotimages=array();
+//        $data = json_decode(file_get_contents('php://input'), true);
+//        if(!empty($data))
+//        {
+//            $files=$data['image'];
+//            $userid=$data['userid'];
+//            $productid=$data['productid'];
+//            $price=$data['price'];
+//            $quantity=$data['quantity'];
+//
+//    //        $orderid=$this->order_model->add($userid);
+//            $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$price,$quantity);
+//            foreach($files as $key=>$file)
+//            {
+//                $imageurl=$file['img'];
+//                $left=$file['left'];
+//                $top=$file['top'];
+//                $order=$key;
+//                $checkcharacters=substr($imageurl, 0, 5);
+//                if($checkcharacters=="https")
+//                {
+//    //                echo "in http".$key;
+//                    $date = new DateTime();
+//                    $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
+//                    
+//                    file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
+//                    $obj=new stdClass();
+//                    $obj->image=$filename;
+//                    $obj->left=$left;
+//                    $obj->top=$top;
+//                    array_push($gotimages,$obj);
+//                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+//                }
+//                else
+//                {
+//    //                echo "in normal".$key;
+//                    $filename=$file['img'];
+//                    $obj=new stdClass();
+//                    $obj->image=$filename;
+//                    $obj->left=$left;
+//                    $obj->top=$top;
+//                    array_push($gotimages,$obj);
+//                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
+//                }
+//            }
+            
+            header("Content-Type: image/jpeg");
+//            echo $this->product_model->viewmergeimage($gotimages);
+            echo $this->menu_model->viewmergeimage();
+//        header("Content-Type: image/jpeg");
+//        echo $this->menu_model->viewmergeimage();
+//    }
     }
 
     public function getproductbyid()
@@ -648,7 +707,7 @@ class Json extends CI_Controller
     {
         $gotimages=array();
         $data = json_decode(file_get_contents('php://input'), true);
-        if(!empty($data))
+        if(1)
         {
             $files=$data['image'];
             $userid=$data['userid'];
@@ -658,8 +717,10 @@ class Json extends CI_Controller
 
     //        $orderid=$this->order_model->add($userid);
             $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$price,$quantity);
-            foreach($files as $key=>$file)
+            $fileslength=count($files); 
+            for($i=0;$i<$fileslength;$i++)
             {
+                $file=$files[$i];
                 $imageurl=$file['img'];
                 $left=$file['left'];
                 $top=$file['top'];
@@ -672,31 +733,43 @@ class Json extends CI_Controller
                     $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
                     
                     file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
-                    array_push($gotimages,$filename);
+                    $obj=new stdClass();
+                    $obj->image=$filename;
+                    $obj->left=$left;
+                    $obj->top=$top;
+                    array_push($gotimages,$obj);
                     $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
                 else
                 {
     //                echo "in normal".$key;
                     $filename=$file['img'];
-                    array_push($gotimages,$filename);
+                    $obj=new stdClass();
+                    $obj->image=$filename;
+                    $obj->left=$left;
+                    $obj->top=$top;
+                    array_push($gotimages,$obj);
                     $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
             }
-            print_r($gotimages);
-            $returnfromthumb=$this->product_model->viewmergeimage($gotimages);
-            $thmbnail=$returnfromthumb;
-//            $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
+            
+            header("Content-Type: image/jpeg");
+            print_r( $this->product_model->viewmergeimage($gotimages));
+            
+           
+            
+           
+//            $date = new DateTime();
+//            $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
 //            file_put_contents('uploads/'.$thmbnail, file_get_contents($returnfromthumb));
-            $addthumbnailtotable=$this->order_model->addthumbnailtouserproductcart($thmbnail,$orderproductcartid);
-            $data['message']=true;
+//            $addthumbnailtotable=$this->order_model->addthumbnailtouserproductcart($thmbnail,$orderproductcartid);
+//            $data['message']=true;
         }
         else
         {
             $data['message']=false;
         }
-        $this->load->view('json',$data);
-//        return 1;
+        //$this->load->view('json',$data);
     }
     
     public function getcountofcartbyuser()
