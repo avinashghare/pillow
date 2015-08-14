@@ -78,28 +78,26 @@ class product_model extends CI_Model
         return $query;
     }
     
-    public function viewmergeimage($gotimages) {
+    public function viewmergeimage($gotimages,$gotimages2) {
         
         $jagzimagesize=240;
         
         $mainimage = imagecreatetruecolor(1200, 1200);
-        
+        $imageall=array();
+        $gotimageslength=count($gotimages);
+        for($i=0;$i<$gotimageslength;$i++)
+        {
+            array_push($imageall,'./uploads/'.$gotimages[$i]->image);
+        }
+    
         $multiplefactor=1200/$jagzimagesize;
-        
-//        $gotimages=array();
-//        array_push($gotimages,"1.jpg");
-//        array_push($gotimages,"2.jpg");
-//        array_push($gotimages,"3.jpg");
-//        array_push($gotimages,"1.jpg");
-        
-//        return $gotimages;
-        
+
         $images=array();
         
-        for($i=0;$i<count($gotimages);$i++)
+        for($i=0;$i<$gotimageslength;$i++)
         {
             $obj=array();
-            $obj["image"]=imagecreatefromjpeg(base_url('uploads/'.$gotimages[$i]->image));
+            $obj['image']=@imagecreatefromjpeg($imageall[$i]);
             $obj["width"]=imagesx($obj["image"]);
             $obj["height"]=imagesy($obj["image"]);
             $obj["top"]=$gotimages[$i]->top;
@@ -483,15 +481,15 @@ class product_model extends CI_Model
             
             $image["thumbwidth"]=imagesx($thumb);
             $image["thumbheight"]=imagesy($thumb);
-//            return imagejpeg($thumb, NULL, 100);
+           
 //                 return $image;
             
             
             imagecopymerge($mainimage, $thumb, $image["xaxis"], $image["yaxis"], $image["newleft"], $image["newtop"], $image["boxwidth"], $image["boxheight"], 100); 
-            return imagejpeg($mainimage, NULL, 100);
+//            return imagejpeg($mainimage, NULL, 100);
             
         }
-//        return imagejpeg($mainimage, NULL, 100);
+        return imagejpeg($mainimage, NULL, 100);
     }
     
     

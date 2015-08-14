@@ -706,6 +706,7 @@ class Json extends CI_Controller
     public function addtocartthumb()
     {
         $gotimages=array();
+         $gotimages2=array();
         $data = json_decode(file_get_contents('php://input'), true);
         if(1)
         {
@@ -738,6 +739,7 @@ class Json extends CI_Controller
                     $obj->left=$left;
                     $obj->top=$top;
                     array_push($gotimages,$obj);
+                    array_push($gotimages2,$filename);
                     $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
                 else
@@ -749,12 +751,14 @@ class Json extends CI_Controller
                     $obj->left=$left;
                     $obj->top=$top;
                     array_push($gotimages,$obj);
+                    array_push($gotimages2,$filename);
                     $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
             }
             
             header("Content-Type: image/jpeg");
-            print_r( $this->product_model->viewmergeimage($gotimages));
+//            print_r( $this->product_model->viewmergeimage($gotimages));
+            echo $this->product_model->viewmergeimage($gotimages,$gotimages2);
             
            
             
@@ -784,6 +788,13 @@ class Json extends CI_Controller
         $userproductcartid=$this->input->get_post('id');
         $data['message']=$this->order_model->deletecartbyid($userproductcartid);
         $this->load->view("json",$data);
+    }
+    
+    public function checkwithone()
+    {
+        header("Content-Type: image/jpeg");
+        $image=imagecreatefromjpeg(base_url('uploads/image-853461439463918.jpg'));
+        echo imagejpeg($image, NULL, 100);
     }
     
     
