@@ -756,24 +756,24 @@ class Json extends CI_Controller
                 }
             }
             
-            header("Content-Type: image/jpeg");
+//            header("Content-Type: image/jpeg");
 //            print_r( $this->product_model->viewmergeimage($gotimages));
-            echo $this->product_model->viewmergeimage($gotimages,$gotimages2);
-            
+//            echo $this->product_model->viewmergeimage($gotimages);
+            $returnfromthumb=$this->product_model->viewmergeimage($gotimages);
            
             
            
-//            $date = new DateTime();
-//            $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
-//            file_put_contents('uploads/'.$thmbnail, file_get_contents($returnfromthumb));
-//            $addthumbnailtotable=$this->order_model->addthumbnailtouserproductcart($thmbnail,$orderproductcartid);
-//            $data['message']=true;
+            $date = new DateTime();
+            $thmbnail = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
+            file_put_contents('uploads/'.$thmbnail, file_get_contents($returnfromthumb));
+            $addthumbnailtotable=$this->order_model->addthumbnailtouserproductcart($thmbnail,$orderproductcartid);
+            $data['message']=true;
         }
         else
         {
             $data['message']=false;
         }
-        //$this->load->view('json',$data);
+        $this->load->view('json',$data);
     }
     
     public function getcountofcartbyuser()

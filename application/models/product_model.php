@@ -78,7 +78,7 @@ class product_model extends CI_Model
         return $query;
     }
     
-    public function viewmergeimage($gotimages,$gotimages2) {
+    public function viewmergeimage($gotimages) {
         
         $jagzimagesize=240;
         
