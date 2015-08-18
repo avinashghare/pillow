@@ -173,6 +173,7 @@ FROM `userproductimagecart`
 //        $shippingaddressforuser=$shippingaddress;
         
         $order=$this->db->insert_id();
+        $returnorderid=$order;
         $mysession["orderid"]=$order;
         $this->session->set_userdata($mysession);
 //        print_r($this->session->all_userdata());
@@ -209,27 +210,19 @@ FROM `userproductimagecart`
                 $queryinsertorderproductimage=$this->db->query("INSERT INTO `pillow_orderproductimage`(`orderproduct`, `image`, `order`, `left`, `top`) VALUES ('$orderproductid','$image','$order','$left','$top')");
             }
             
-            $deletecartdataquery1=$this->db->query("DELETE FROM `userproductcart` WHERE `id`='$userproductcartid'");
-            $deletecartdataquery2=$this->db->query("DELETE FROM `userproductimagecart` WHERE `userproductcart`='$userproductcartid'");
         }
         
-//        foreach($carts as $cart)
-//        {
-//            $querycart=$this->db->query("INSERT INTO `orderitems`(`order`, `product`, `quantity`, `price`, `finalprice`) VALUES ('$order','".$cart['id']."','".$cart['qty']."','".$cart['price']."','".$cart['subtotal']."')");
-//            $quantity=intval($cart['qty']);
-//            $productid=$cart['id'];
-//            $this->db->query("UPDATE `product` SET `product`.`quantity`=`product`.`quantity`-$quantity WHERE `product`.`id`='$productid'");
-//            
-//            
-//        }
-        if(!$query)
+            //delete all userproductcart and userproductcartimages
+            $deletecartdataquery1=$this->db->query("DELETE FROM `userproductcart` WHERE `id`='$userproductcartid'");
+            $deletecartdataquery2=$this->db->query("DELETE FROM `userproductimagecart` WHERE `userproductcart`='$userproductcartid'");
+        
+        if($returnorderid<=0)
         {
             return 0;
         }
         else
         {
-            //delete all userproductcart and userproductcartimages
-            return intval($order);
+            return intval($returnorderid);
         }
 	}
 	
@@ -256,6 +249,38 @@ FROM `userproductimagecart`
     {
         $queryupdate=$this->db->query("UPDATE `userproductcart` SET `thumbnail`='$thmbnail' WHERE `id`='$userproductcartid'");
         return $queryupdate;
+    }
+    
+    function pendingaddtocart($orderproductid)
+    {
+        $queryselect=$this->db->query("SELECT `pillow_orderproduct`.`id`,`pillow_orderproduct`. `order`,`pillow_orderproduct`. `product`,`pillow_orderproduct`. `quantity`, `pillow_orderproduct`.`price`,`pillow_orderproduct`. `discount`,`pillow_orderproduct`. `finalprice`,`pillow_orderproduct`. `thumbnail` ,`pillow_order`.`user`
+FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_orderproduct`.`order`=`pillow_order`.`id` WHERE `id`='$orderproductid'")->row();
+        $userid=$queryselect->user;
+        $productid=$queryselect->product;
+        $quantity=$queryselect->quantity;
+        $price=$queryselect->price;
+        $discount=$queryselect->discount;
+        $total=$queryselect->finalprice;
+        $thumbnail=$queryselect->thumbnail;
+        
+        $queryinsertincart=$this->db->query("INSERT INTO `userproductcart`(`id`, `user`,`product`,`quantity`,`finalprice`,`price`) VALUES (NULL,'$userid','$productid','$quantity','$total','$price')");
+        $userproductcartid=$this->db->insert_id();
+        
+        $queryselectorderproductimage=$this->db->query("SELECT * FROM `pillow_orderproductimage` WHERE `orderproduct`='$orderproductid'")->result();
+        foreach($queryselectorderproductimage as $key=>$row)
+        {
+            $image=$row->image;
+            $order=$row->order;
+            $left=$row->left;
+            $top=$row->top;
+            $insertqueryforimages=$this->db->query("INSERT INTO `userproductimagecart`(`id`, `userproductcart`,`image`,`order`,`left`,`top`) VALUES (NULL,'$userproductcartid','$image','$order','$left','$top')");
+        }
+        
+        if($queryinsertincart)
+            return 1;
+        else
+            return 0;
+        
     }
 }
 ?>

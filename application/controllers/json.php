@@ -666,6 +666,16 @@ class Json extends CI_Controller
         echo imagejpeg($image, NULL, 100);
     }
     
+    public function pendingaddtocart()
+    {
+        $orderproductid=$this->input->get('orderproductid');
+        $data['message']=$this->order_model->pendingaddtocart($orderproductid);
+        $this->load->view("json",$data);
+    }
+    
+    
+    
+    
     //old cart functions
     
     function addtocartoldtoo() {
