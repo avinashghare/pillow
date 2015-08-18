@@ -91,7 +91,7 @@ class order_model extends CI_Model
         $total=floatval($price)*intval($quantity);
         $query=$this->db->query("UPDATE `userproductcart` SET `user`='$userid',`product`='$productid',`quantity`='$quantity',`price`='$price',`finalprice`='$total' WHERE `id`='$userproductcartid'");
         $id=$this->db->insert_id();
-        return $id;
+        return $userproductcartid;
     }
     
     function addorderimageonproceed($orderproductid,$filename,$order)
@@ -175,7 +175,7 @@ FROM `userproductimagecart`
         $order=$this->db->insert_id();
         $mysession["orderid"]=$order;
         $this->session->set_userdata($mysession);
-        print_r($this->session->all_userdata());
+//        print_r($this->session->all_userdata());
         
         $userproductcartdetails=$this->db->query("SELECT `userproductcart`.`id`,`userproductcart`. `user`,`userproductcart`. `product`,`userproductcart`. `quantity`,`userproductcart`. `price`,`userproductcart`. `discount`,`userproductcart`. `finalprice`,`userproductcart`. `thumbnail`,`user`.`email`
 FROM `userproductcart` LEFT OUTER JOIN `user` ON `user`.`id`=`userproductcart`.`user`
@@ -208,6 +208,9 @@ FROM `userproductimagecart`
                 $top=$value2->top;
                 $queryinsertorderproductimage=$this->db->query("INSERT INTO `pillow_orderproductimage`(`orderproduct`, `image`, `order`, `left`, `top`) VALUES ('$orderproductid','$image','$order','$left','$top')");
             }
+            
+            $deletecartdataquery1=$this->db->query("DELETE FROM `userproductcart` WHERE `id`='$userproductcartid'");
+            $deletecartdataquery2=$this->db->query("DELETE FROM `userproductimagecart` WHERE `userproductcart`='$userproductcartid'");
         }
         
 //        foreach($carts as $cart)
@@ -219,9 +222,15 @@ FROM `userproductimagecart`
 //            
 //            
 //        }
-        
-        
-		return $order;
+        if(!$query)
+        {
+            return 0;
+        }
+        else
+        {
+            //delete all userproductcart and userproductcartimages
+            return intval($order);
+        }
 	}
 	
     function updateorderstatusafterpayment($orderid)

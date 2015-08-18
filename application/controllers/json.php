@@ -44,31 +44,7 @@ class Json extends CI_Controller
         $data['message']=$this->product_model->getallproducts();
         $this->load->view('json',$data);
     }
-    
-    
-    public function saveimageinuploads()
-    {
-//        $url = 'http://www.gettyimages.in/gi-resources/images/Homepage/Category-Creative/UK/UK_Creative_462809583.jpg';
-        $url = 'https://scontent.cdninstagram.com/hphotos-xaf1/t51.2885-15/s640x640/sh0.08/e35/11351607_1477019669285380_343422983_n.jpg';
-        /* parse file and get hostname*/
-//        $parse = parse_url($url);
-//        print $parse['host'];
-//        echo substr($url, 0, 5);
-        /* Extract the filename */
-//        $timestamp=new DateTime();
-//        $timestamp=$timestamp->format('Y-m-d_H.i.s');
-//        
-//        $filename = substr($url, strrpos($url, '/') + 1);
-//        $filename=$timestamp.$filename;
-        /* Save file wherever you want */
-        $date = new DateTime();
-        $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
-//        echo base_url() .'uploads/'.$filename;
-        file_put_contents('uploads/'.$filename, file_get_contents($url));
-        echo "<br>".$filename."<br>";
-        echo base_url() .'uploads/'.$filename;
-    }
-
+   
     public function createpillow()
     {
         
@@ -103,7 +79,7 @@ class Json extends CI_Controller
     
     }
     
-    public function addtocart()
+    public function addtocartold()
     {
     
         $data = json_decode(file_get_contents('php://input'), true);
@@ -115,7 +91,6 @@ class Json extends CI_Controller
             $price=$data['price'];
             $quantity=$data['quantity'];
 
-    //        $orderid=$this->order_model->add($userid);
             $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$price,$quantity);
             foreach($files as $key=>$file)
             {
@@ -126,7 +101,6 @@ class Json extends CI_Controller
                 $checkcharacters=substr($imageurl, 0, 5);
                 if($checkcharacters=="https")
                 {
-    //                echo "in http".$key;
                     $date = new DateTime();
                     $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
 
@@ -135,7 +109,6 @@ class Json extends CI_Controller
                 }
                 else
                 {
-    //                echo "in normal".$key;
                     $filename=$file['img'];
                     $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
@@ -154,6 +127,8 @@ class Json extends CI_Controller
     
     public function editcart()
     {
+        $gotimages=array();
+         $gotimages2=array();
     
         $data = json_decode(file_get_contents('php://input'), true);
         if(!empty($data))
@@ -165,11 +140,12 @@ class Json extends CI_Controller
             $quantity=$data['quantity'];
             $userproductcartid=$data['userproductcartid'];
 
-    //        $orderid=$this->order_model->add($userid);
             $orderproductcartid=$this->order_model->addorderproductcartonaddtocartonedit($userid,$productid,$price,$quantity,$userproductcartid);
             $deleteuserproductimagecart=$this->order_model->deleteuserproductimagecart($userproductcartid);
-            foreach($files as $key=>$file)
+            $fileslength=count($files);
+            for($i=0;$i<$fileslength;$i++)
             {
+                $file=$files[$i];
                 $imageurl=$file['img'];
                 $left=$file['left'];
                 $top=$file['top'];
@@ -177,20 +153,34 @@ class Json extends CI_Controller
                 $checkcharacters=substr($imageurl, 0, 5);
                 if($checkcharacters=="https")
                 {
-    //                echo "in http".$key;
                     $date = new DateTime();
-                    $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpg";
-
+                    $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
+                    
                     file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
-                    $this->order_model->adduserproductimagecartonaddtocart($userproductcartid,$filename,$order,$left,$top);
+                    $obj=new stdClass();
+                    $obj->image=$filename;
+                    $obj->left=$left;
+                    $obj->top=$top;
+                    array_push($gotimages,$obj);
+                    array_push($gotimages2,$filename);
+                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
                 else
                 {
-    //                echo "in normal".$key;
                     $filename=$file['img'];
-                    $this->order_model->adduserproductimagecartonaddtocart($userproductcartid,$filename,$order,$left,$top);
+                    $obj=new stdClass();
+                    $obj->image=$filename;
+                    $obj->left=$left;
+                    $obj->top=$top;
+                    array_push($gotimages,$obj);
+                    array_push($gotimages2,$filename);
+                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
                 }
             }
+            $returnfromthumb=$this->product_model->viewmergeimage($gotimages);
+           
+            $this->order_model->addthumbnailtouserproductcart($returnfromthumb,$orderproductcartid);
+           
             $data['message']=true;
         }
         else
@@ -198,7 +188,6 @@ class Json extends CI_Controller
             $data['message']=false;
         }
         $this->load->view('json',$data);
-//        return 1;
     }
     
     
@@ -218,53 +207,6 @@ class Json extends CI_Controller
         $data["message"] = $this->order_model->getusercart($user);
         $this->load->view("json", $data);
     }
-//    function addcartsession() {
-//        $cart = $this->input->get_post('cart');
-//        $data["message"] = $this->order_model->addcartsession($cart);
-//        $this->load->view("json", $data);
-//    }
-    function addtocartold() {
-        $user = $this->input->get_post('user');
-        $product = $this->input->get_post('product');
-        $productname = $this->input->get_post('productname');
-        $quantity = $this->input->get_post('quantity');
-        $price = $this->input->get_post('price');
-//        $image = $this->input->get_post('image');
-        $data["message"] = $this->user_model->addtocart($product, $productname, $quantity, $price);
-        //$data["message"]=$this->order_model->addtocart($user,$product,$quantity);
-        $this->load->view("json", $data);
-    }
-    function destroycart() {
-        $data["message"] = $this->user_model->destroycart();
-        $this->load->view("json", $data);
-    }
-    function showcart() {
-        $userid=$this->session->userdata("id");
-        if($userid!="")
-        {
-            $data['message']=$this->user_model->getusercartdetails($userid);
-            $this->load->view("json", $data);
-        }
-        else
-        {
-            $cart = $this->cart->contents();
-            $newcart = array();
-            foreach ($cart as $item) {
-                array_push($newcart, $item);
-            }
-            $data["message"] = $newcart;
-            $this->load->view("json", $data);
-        }
-    }
-    function totalcart() {
-        $data["message"] = $this->cart->total();
-        $this->load->view("json", $data);
-    }
-    function totalitemcart() {
-        $data["message"] = $this->cart->total_items();
-        $this->load->view("json", $data);
-    }
-    
     function getorderproductbyuser()
     {
         $userid=$this->input->get("userid");
@@ -526,21 +468,6 @@ class Json extends CI_Controller
         $this->load->view("json",$data);
     }
     
-    public function mergeimage()
-    {
-        $src1 = imagecreatefrompng('https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png');
-        $src2 = imagecreatefrompng('http://img15.deviantart.net/e2e6/i/2012/339/8/a/png_material_by_moonglowlilly-d5n4w1c.png');
-
-        //Change the arguments below to suit your needs
-        imagecopymerge($src1, $src2, 50, 50, 50, 50, 200, 200, 100); 
-
-        header('Content-Type: image/png');
-        imagepng($src1);
-
-        imagedestroy($src1);
-        imagedestroy($src2);
-    }
-    
     //payment gateway
     
     function placeorder() {
@@ -552,8 +479,6 @@ class Json extends CI_Controller
         $email = $order['email'];
         $phone = $order['phone'];
         $status = $order['status'];
-//        $company = $order['company'];
-//        $fax = $order['fax'];
         $billingaddress = $order['billingaddress'];
         $billingcity = $order['billingcity'];
         $billingstate = $order['billingstate'];
@@ -569,7 +494,6 @@ class Json extends CI_Controller
         $finalamount = $order['finalamount'];
         $shippingname = $order['shippingname'];
         $shippingtel = $order['shippingtel'];
-//        $customernote = $order['customernote'];
         $data["message"] = $this->order_model->placeorder($user, $firstname, $lastname, $email, $billingaddress, $billingcity, $billingstate, $billingcountry, $shippingaddress, $shippingcity, $shippingcountry, $shippingstate, $shippingpincode, $billingpincode, $phone, $status,  $finalamount, $shippingmethod, $shippingname, $shippingtel);
 //        $data["message"] = $this->order_model->placeorder($user, $firstname, $lastname, $email, $billingaddress, $billingcity, $billingstate, $billingcountry, $shippingaddress, $shippingcity, $shippingcountry, $shippingstate, $shippingpincode, $billingpincode, $phone, $status, $company, $fax, $carts, $finalamount, $shippingmethod, $shippingname, $shippingtel, $customernote);
         $this->load->view("json", $data);
@@ -636,65 +560,6 @@ class Json extends CI_Controller
         echo $this->menu_model->viewmergeimage();
     }
 
-    public function viewmergeimage2() {
-        
-//        print_r($this->product_model->viewmergeimage());
-//        
-        
-        $gotimages=array();
-//        $data = json_decode(file_get_contents('php://input'), true);
-//        if(!empty($data))
-//        {
-//            $files=$data['image'];
-//            $userid=$data['userid'];
-//            $productid=$data['productid'];
-//            $price=$data['price'];
-//            $quantity=$data['quantity'];
-//
-//    //        $orderid=$this->order_model->add($userid);
-//            $orderproductcartid=$this->order_model->addorderproductcartonaddtocart($userid,$productid,$price,$quantity);
-//            foreach($files as $key=>$file)
-//            {
-//                $imageurl=$file['img'];
-//                $left=$file['left'];
-//                $top=$file['top'];
-//                $order=$key;
-//                $checkcharacters=substr($imageurl, 0, 5);
-//                if($checkcharacters=="https")
-//                {
-//    //                echo "in http".$key;
-//                    $date = new DateTime();
-//                    $filename = "image-".rand(0, 100000)."".$date->getTimestamp().".jpeg";
-//                    
-//                    file_put_contents('uploads/'.$filename, file_get_contents($imageurl));
-//                    $obj=new stdClass();
-//                    $obj->image=$filename;
-//                    $obj->left=$left;
-//                    $obj->top=$top;
-//                    array_push($gotimages,$obj);
-//                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
-//                }
-//                else
-//                {
-//    //                echo "in normal".$key;
-//                    $filename=$file['img'];
-//                    $obj=new stdClass();
-//                    $obj->image=$filename;
-//                    $obj->left=$left;
-//                    $obj->top=$top;
-//                    array_push($gotimages,$obj);
-//                    $this->order_model->adduserproductimagecartonaddtocart($orderproductcartid,$filename,$order,$left,$top);
-//                }
-//            }
-            
-            header("Content-Type: image/jpeg");
-//            echo $this->product_model->viewmergeimage($gotimages);
-            echo $this->menu_model->viewmergeimage();
-//        header("Content-Type: image/jpeg");
-//        echo $this->menu_model->viewmergeimage();
-//    }
-    }
-
     public function getproductbyid()
     {
         $id=$this->input->get_post('id');
@@ -703,12 +568,13 @@ class Json extends CI_Controller
     }
     
     
-    public function addtocartthumb()
+//    public function addtocartthumb()   previous name
+    public function addtocart()
     {
         $gotimages=array();
          $gotimages2=array();
         $data = json_decode(file_get_contents('php://input'), true);
-        if(1)
+        if(!empty($data))
         {
             $files=$data['image'];
             $userid=$data['userid'];
@@ -792,6 +658,50 @@ class Json extends CI_Controller
         header("Content-Type: image/jpeg");
         $image=imagecreatefromjpeg(base_url('uploads/image-853461439463918.jpg'));
         echo imagejpeg($image, NULL, 100);
+    }
+    
+    //old cart functions
+    
+    function addtocartoldtoo() {
+        $user = $this->input->get_post('user');
+        $product = $this->input->get_post('product');
+        $productname = $this->input->get_post('productname');
+        $quantity = $this->input->get_post('quantity');
+        $price = $this->input->get_post('price');
+//        $image = $this->input->get_post('image');
+        $data["message"] = $this->user_model->addtocart($product, $productname, $quantity, $price);
+        //$data["message"]=$this->order_model->addtocart($user,$product,$quantity);
+        $this->load->view("json", $data);
+    }
+    function destroycart() {
+        $data["message"] = $this->user_model->destroycart();
+        $this->load->view("json", $data);
+    }
+    function showcart() {
+        $userid=$this->session->userdata("id");
+        if($userid!="")
+        {
+            $data['message']=$this->user_model->getusercartdetails($userid);
+            $this->load->view("json", $data);
+        }
+        else
+        {
+            $cart = $this->cart->contents();
+            $newcart = array();
+            foreach ($cart as $item) {
+                array_push($newcart, $item);
+            }
+            $data["message"] = $newcart;
+            $this->load->view("json", $data);
+        }
+    }
+    function totalcart() {
+        $data["message"] = $this->cart->total();
+        $this->load->view("json", $data);
+    }
+    function totalitemcart() {
+        $data["message"] = $this->cart->total_items();
+        $this->load->view("json", $data);
     }
     
     
