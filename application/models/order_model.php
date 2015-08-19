@@ -228,7 +228,7 @@ FROM `userproductimagecart`
 	
     function updateorderstatusafterpayment($orderid)
     {
-        $query=$this->db->query("UPDATE `pillow_order` SET `orderstatus`=2 WHERE `id`=$orderid");
+        $query=$this->db->query("UPDATE `pillow_order` SET `orderstatus`=2 WHERE `id`='$orderid'");
         return $query;
     }
     
@@ -277,7 +277,7 @@ FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_orderproduc
         }
         
         if($queryinsertincart)
-            return 1;
+            return $userproductcartid;
         else
             return 0;
         
