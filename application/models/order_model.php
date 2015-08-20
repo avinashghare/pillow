@@ -203,18 +203,19 @@ FROM `userproductimagecart`
             
             foreach($userproductimagecartdetails as $key2=>$value2)
             {
+                $userproductimagecartid=$value2->id;
                 $image=$value2->image;
                 $order=$value2->order;
                 $left=$value2->left;
                 $top=$value2->top;
                 $queryinsertorderproductimage=$this->db->query("INSERT INTO `pillow_orderproductimage`(`orderproduct`, `image`, `order`, `left`, `top`) VALUES ('$orderproductid','$image','$order','$left','$top')");
+                $deletecartdataquery2=$this->db->query("DELETE FROM `userproductimagecart` WHERE `id`='$userproductimagecartid'");
             }
             
         }
         
             //delete all userproductcart and userproductcartimages
-            $deletecartdataquery1=$this->db->query("DELETE FROM `userproductcart` WHERE `id`='$userproductcartid'");
-            $deletecartdataquery2=$this->db->query("DELETE FROM `userproductimagecart` WHERE `userproductcart`='$userproductcartid'");
+            $deletecartdataquery1=$this->db->query("DELETE FROM `userproductcart` WHERE `user`='$user'");
         
         if($returnorderid<=0)
         {

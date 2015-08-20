@@ -100,7 +100,7 @@ class product_model extends CI_Model
             $obj['image']=@imagecreatefromjpeg($imageall[$i]);
             $obj["width"]=imagesx($obj["image"]);
             $obj["height"]=imagesy($obj["image"]);
-            $obj["top"]=floatval(($gotimages[$i]->top)*(-1);
+            $obj["top"]=floatval($gotimages[$i]->top)*(-1);
             $obj["left"]=$gotimages[$i]->left;
             $obj["newtop"]=$obj["top"]*$multiplefactor;
             $obj["newleft"]=$obj["left"]*$multiplefactor;
