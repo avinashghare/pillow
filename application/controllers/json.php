@@ -286,7 +286,7 @@ class Json extends CI_Controller
             $orderby="id";
             $orderorder="ASC";
         }
-        $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_order`.`id`=`pillow_orderproduct`.`order` LEFT OUTER JOIN `orderstatus` ON `orderstatus`.`id` =`pillow_order`.`id`","WHERE `pillow_order`.`user`='$userid'");
+        $data["message"]=$this->chintantable->query($pageno,$maxrow,$orderby,$orderorder,$search,$elements,"FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_order`.`id`=`pillow_orderproduct`.`order` LEFT OUTER JOIN `orderstatus` ON `orderstatus`.`id` =`pillow_order`.`orderstatus`","WHERE `pillow_order`.`user`='$userid'");
         $this->load->view("json",$data);
     }
     
