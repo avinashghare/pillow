@@ -255,7 +255,7 @@ FROM `userproductimagecart`
     function pendingaddtocart($orderproductid)
     {
         $queryselect=$this->db->query("SELECT `pillow_orderproduct`.`id`,`pillow_orderproduct`. `order`,`pillow_orderproduct`. `product`,`pillow_orderproduct`. `quantity`, `pillow_orderproduct`.`price`,`pillow_orderproduct`. `discount`,`pillow_orderproduct`. `finalprice`,`pillow_orderproduct`. `thumbnail` ,`pillow_order`.`user`
-FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_orderproduct`.`order`=`pillow_order`.`id` WHERE `id`='$orderproductid'")->row();
+FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_orderproduct`.`order`=`pillow_order`.`id` WHERE `pillow_orderproduct`.`id`='$orderproductid'")->row();
         $userid=$queryselect->user;
         $productid=$queryselect->product;
         $quantity=$queryselect->quantity;
