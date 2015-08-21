@@ -278,9 +278,15 @@ FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_orderproduc
         }
         
         if($queryinsertincart)
+        {
+            $this->db->query("DELETE FROM `pillow_orderproduct` WHERE `id`='$orderproductid'");
+            $this->db->query("DELETE FROM `pillow_orderproductimage` WHERE `orderproduct`='$orderproductid'");
             return $userproductcartid;
+        }
         else
+        {
             return 0;
+        }
         
     }
 }
