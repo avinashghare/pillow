@@ -185,7 +185,7 @@ WHERE `userproductcart`.`user`='$user'")->result();
         foreach($userproductcartdetails as $key=>$value)
         {
             $userproductcartid=$value->id;
-            $orderid=$value->order;
+//            $orderid=$value->order;
             $userid=$value->user;
             $productid=$value->product;
             $quantity=$value->quantity;
@@ -201,7 +201,7 @@ WHERE `userproductcart`.`user`='$user'")->result();
 FROM `userproductimagecart` 
         WHERE `userproductimagecart` .`userproductcart`='$userproductcartid'")->result();
             
-            foreach($userproductimagecartdetails as $key2=>$value2)
+            foreach($userproductimagecartdetails as $value2)
             {
                 $userproductimagecartid=$value2->id;
                 $image=$value2->image;
@@ -215,6 +215,7 @@ FROM `userproductimagecart`
         }
         
             //delete all userproductcart and userproductcartimages
+        
             $deletecartdataquery1=$this->db->query("DELETE FROM `userproductcart` WHERE `user`='$user'");
         
         if($returnorderid<=0)
@@ -264,7 +265,7 @@ FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_orderproduc
         $total=$queryselect->finalprice;
         $thumbnail=$queryselect->thumbnail;
         
-        $queryinsertincart=$this->db->query("INSERT INTO `userproductcart`(`id`, `user`,`product`,`quantity`,`finalprice`,`price`) VALUES (NULL,'$userid','$productid','$quantity','$total','$price')");
+        $queryinsertincart=$this->db->query("INSERT INTO `userproductcart`(`id`, `user`,`product`,`quantity`,`finalprice`,`price`,`thumbnail`) VALUES (NULL,'$userid','$productid','$quantity','$total','$price','$thumbnail')");
         $userproductcartid=$this->db->insert_id();
         
         $queryselectorderproductimage=$this->db->query("SELECT * FROM `pillow_orderproductimage` WHERE `orderproduct`='$orderproductid'")->result();
