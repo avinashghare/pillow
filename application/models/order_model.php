@@ -290,5 +290,6 @@ FROM `pillow_orderproduct` LEFT OUTER JOIN `pillow_order` ON `pillow_orderproduc
         }
         
     }
+    
 }
 ?>
